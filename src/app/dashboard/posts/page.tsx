@@ -1,12 +1,14 @@
-"use client";
+'use client';
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { DataTable } from "@/components/ui/data-table";
 import { postService } from "@/features/posts/services/post.service";
 import { Post } from "@/features/posts/types";
-import { Edit, Eye, FileText, MoreVertical, Plus, Trash2 } from "lucide-react";
+import { Edit, MoreVertical, Plus, Trash2, FileText } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
@@ -20,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function PostsPage() {
+    const router = useRouter();
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -38,6 +41,7 @@ export default function PostsPage() {
             setTotalPages(response.meta?.total_pages || 1);
         } catch (error) {
             console.error("Failed to fetch posts:", error);
+            toast.error("Failed to fetch posts");
         } finally {
             setIsLoading(false);
         }
@@ -49,6 +53,18 @@ export default function PostsPage() {
         }, 300);
         return () => clearTimeout(debounce);
     }, [fetchPosts]);
+
+    const handleDelete = async (postId: string) => {
+        if (window.confirm("Are you sure you want to delete this post?")) {
+            try {
+                await postService.deletePost(postId);
+                toast.success("Post deleted successfully");
+                fetchPosts();
+            } catch (error) {
+                toast.error("Failed to delete post");
+            }
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -147,7 +163,7 @@ export default function PostsPage() {
                     },
                     {
                         header: "Actions",
-                        cell: () => (
+                        cell: (post) => (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -157,16 +173,17 @@ export default function PostsPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                    <DropdownMenuItem>
-                                        <Eye className="w-4 h-4 mr-2" />
-                                        View
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => router.push(`/dashboard/posts/${post.id}/edit`)}
+                                    >
                                         <Edit className="w-4 h-4 mr-2" />
                                         Edit
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="text-destructive">
+                                    <DropdownMenuItem
+                                        className="text-destructive"
+                                        onClick={() => handleDelete(post.id)}
+                                    >
                                         <Trash2 className="w-4 h-4 mr-2" />
                                         Delete
                                     </DropdownMenuItem>

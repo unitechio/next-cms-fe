@@ -9,6 +9,7 @@ import {
   PaginatedResponse,
   OnlineUser,
   WebSocketStats,
+  WebSocketMessage,
 } from "./types";
 
 class NotificationService {
@@ -102,7 +103,7 @@ class NotificationService {
     return response.data;
   }
 
-  async broadcastMessage(message: any): Promise<void> {
+  async broadcastMessage(message: WebSocketMessage): Promise<void> {
     await apiClient.post(`${this.wsUrl}/broadcast`, message);
   }
 

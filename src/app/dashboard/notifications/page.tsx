@@ -1,164 +1,175 @@
-"use client";
+'use client';
 
-import { useNotifications } from "@/features/notifications/hooks/useNotifications";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState, useCallback } from "react";
+import { DataTable } from "@/components/ui/data-table";
+import { notificationService } from "@/features/notifications/notification.service";
+import { Notification } from "@/features/notifications/types";
+import { MoreVertical, Trash2, Check, X } from "lucide-react";
+import { format } from "date-fns";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { NotificationItem } from "@/features/notifications/components/notification-item";
-import { CheckCheck, Trash2, Loader2, RefreshCw } from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { NotificationDialog } from "@/features/notifications/components/notification-dialog";
 
 export default function NotificationsPage() {
-    const {
-        notifications,
-        unreadCount,
-        stats,
-        loading,
-        hasMore,
-        isConnected,
-        markAllAsRead,
-        deleteAllNotifications,
-        loadMore,
-        refresh,
-    } = useNotifications();
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+
+    const fetchNotifications = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const response = await notificationService.getMyNotifications({ limit: 10, after: (page - 1) * 10 });
+            setNotifications(response.data || []);
+            setTotalPages(response.next_cursor ? page + 1 : page);
+        } catch (error) {
+            console.error("Failed to fetch notifications:", error);
+            toast.error("Failed to fetch notifications");
+        } finally {
+            setIsLoading(false);
+        }
+    }, [page]);
+
+    useEffect(() => {
+        fetchNotifications();
+    }, [fetchNotifications]);
+
+    const handleSuccess = () => {
+        fetchNotifications();
+    };
+
+    const handleDelete = async (id: number) => {
+        if (window.confirm("Are you sure you want to delete this notification?")) {
+            try {
+                await notificationService.deleteNotification(id);
+                toast.success("Notification deleted successfully");
+                fetchNotifications();
+            } catch (error) {
+                toast.error("Failed to delete notification");
+            }
+        }
+    };
+    
+    const handleMarkAsRead = async (id: number) => {
+        try {
+            await notificationService.markAsRead(id);
+            toast.success("Notification marked as read");
+            fetchNotifications();
+        } catch (error) {
+            toast.error("Failed to mark as read");
+        }
+    };
+
+    const handleMarkAsUnread = async (id: number) => {
+        try {
+            await notificationService.markAsUnread(id);
+            toast.success("Notification marked as unread");
+            fetchNotifications();
+        } catch (error) {
+            toast.error("Failed to mark as unread");
+        }
+    };
 
     return (
         <div className="space-y-6">
-            {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold">Notifications</h1>
-                    <p className="text-muted-foreground">
-                        Manage your notifications and stay updated
-                    </p>
+                    <h1 className="text-3xl font-bold tracking-tight mb-2">Notifications</h1>
+                    <p className="text-muted-foreground">Manage your notifications.</p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Badge variant={isConnected ? "default" : "secondary"}>
-                        {isConnected ? "Connected" : "Disconnected"}
-                    </Badge>
-                    <Button variant="outline" size="icon" onClick={refresh}>
-                        <RefreshCw className="h-4 w-4" />
-                    </Button>
-                </div>
+                <NotificationDialog onSuccess={handleSuccess} />
             </div>
 
-            {/* Stats Cards */}
-            {stats && (
-                <div className="grid gap-4 md:grid-cols-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{stats.total}</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Unread</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{stats.unread}</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Info</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{stats.by_type.info || 0}</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Urgent</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                {stats.by_priority.urgent || 0}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
-
-            {/* Notifications List */}
-            <Card>
-                <CardHeader>
-                    <div className="flex items-center justify-between">
-                        <CardTitle>All Notifications</CardTitle>
-                        <div className="flex gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={markAllAsRead}
-                                disabled={unreadCount === 0}
-                            >
-                                <CheckCheck className="h-4 w-4 mr-2" />
-                                Mark All Read
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                    if (
-                                        confirm("Are you sure you want to delete all notifications?")
-                                    ) {
-                                        deleteAllNotifications();
-                                    }
-                                }}
-                                disabled={notifications.length === 0}
-                            >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete All
-                            </Button>
-                        </div>
-                    </div>
-                </CardHeader>
-                <CardContent className="p-0">
-                    {loading && notifications.length === 0 ? (
-                        <div className="flex items-center justify-center h-40">
-                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                        </div>
-                    ) : notifications.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
-                            <p>No notifications</p>
-                        </div>
-                    ) : (
-                        <>
-                            <ScrollArea className="h-[600px]">
-                                <div className="divide-y">
-                                    {notifications.map((notification) => (
-                                        <NotificationItem
-                                            key={notification.id}
-                                            notification={notification}
-                                        />
-                                    ))}
-                                </div>
-                            </ScrollArea>
-
-                            {hasMore && (
-                                <div className="p-4 text-center border-t">
-                                    <Button
-                                        variant="outline"
-                                        onClick={loadMore}
-                                        disabled={loading}
-                                    >
-                                        {loading ? (
-                                            <>
-                                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                                Loading...
-                                            </>
-                                        ) : (
-                                            "Load More"
-                                        )}
+            <DataTable
+                data={notifications}
+                isLoading={isLoading}
+                pagination={{
+                    currentPage: page,
+                    totalPages: totalPages,
+                    onPageChange: setPage,
+                }}
+                columns={[
+                    {
+                        header: "Title",
+                        accessorKey: "title",
+                    },
+                    {
+                        header: "Message",
+                        accessorKey: "message",
+                        cell: (notification) => <p className="truncate max-w-xs">{notification.message}</p>
+                    },
+                    {
+                        header: "Type",
+                        accessorKey: "type",
+                        cell: (notification) => (
+                            <Badge variant="outline" className="capitalize">{notification.type}</Badge>
+                        ),
+                    },
+                    {
+                        header: "Priority",
+                        accessorKey: "priority",
+                        cell: (notification) => (
+                            <Badge variant="secondary" className="capitalize">{notification.priority}</Badge>
+                        )
+                    },
+                    {
+                        header: "Read",
+                        accessorKey: "is_read",
+                        cell: (notification) => (notification.is_read ? <Check className="w-4 h-4 text-green-500" /> : <X className="w-4 h-4 text-red-500" />),
+                    },
+                    {
+                        header: "Created At",
+                        accessorKey: "created_at",
+                        cell: (notification) => (
+                            <span className="text-muted-foreground text-sm">
+                                {format(new Date(notification.created_at), "MMM d, yyyy")}
+                            </span>
+                        ),
+                    },
+                    {
+                        header: "Actions",
+                        cell: (notification) => (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                        <span className="sr-only">Open menu</span>
+                                        <MoreVertical className="h-4 w-4" />
                                     </Button>
-                                </div>
-                            )}
-                        </>
-                    )}
-                </CardContent>
-            </Card>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                    {notification.is_read ? (
+                                        <DropdownMenuItem onClick={() => handleMarkAsUnread(notification.id)}>
+                                            Mark as unread
+                                        </DropdownMenuItem>
+                                    ) : (
+                                        <DropdownMenuItem onClick={() => handleMarkAsRead(notification.id)}>
+                                            Mark as read
+                                        </DropdownMenuItem>
+                                    )}
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        className="text-destructive"
+                                        onClick={() => handleDelete(notification.id)}
+                                    >
+                                        <Trash2 className="w-4 h-4 mr-2" />
+                                        Delete
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        ),
+                    },
+                ]}
+            />
         </div>
     );
 }
