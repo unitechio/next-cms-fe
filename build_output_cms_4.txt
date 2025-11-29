@@ -1,0 +1,56 @@
+
+> next-cms-fe@0.1.0 build
+> next build
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.5 (Turbopack)
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully in 23.3s
+   Running TypeScript ...
+   Collecting page data using 5 workers ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 5 workers (0/23) ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 5 workers (5/23) 
+   Generating static pages using 5 workers (11/23) 
+   Generating static pages using 5 workers (17/23) 
+ ✓ Generating static pages using 5 workers (23/23) in 4.3s
+   Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /dashboard
+├ ○ /dashboard/audit-logs
+├ ○ /dashboard/authorization/departments
+├ ○ /dashboard/authorization/modules
+├ ○ /dashboard/authorization/permissions
+├ ○ /dashboard/authorization/scopes
+├ ○ /dashboard/authorization/services
+├ ○ /dashboard/media
+├ ○ /dashboard/notifications
+├ ○ /dashboard/posts
+├ ƒ /dashboard/posts/[id]/edit
+├ ○ /dashboard/posts/new
+├ ○ /dashboard/profile
+├ ○ /dashboard/roles
+├ ƒ /dashboard/roles/[id]
+├ ○ /dashboard/roles/new
+├ ○ /dashboard/settings
+├ ○ /dashboard/users
+├ ƒ /dashboard/users/[id]/edit
+├ ○ /dashboard/users/new
+├ ○ /debug
+└ ○ /login
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -1,0 +1,71 @@
+
+> next-cms-fe@0.1.0 build
+> next build
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.5 (Turbopack)
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+
+> Build error occurred
+Error: Turbopack build failed with 2 errors:
+./src/components/ui/rich-text-editor.tsx:8:1
+Export default doesn't exist in target module
+[0m [90m  6 |[39m [36mimport[39m [33mImage[39m [36mfrom[39m [32m'@tiptap/extension-image'[39m[33m;[39m
+ [90m  7 |[39m [36mimport[39m [33mLink[39m [36mfrom[39m [32m'@tiptap/extension-link'[39m[33m;[39m
+[31m[1m>[22m[39m[90m  8 |[39m [36mimport[39m [33mTable[39m [36mfrom[39m [32m'@tiptap/extension-table'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m  9 |[39m [36mimport[39m [33mTableRow[39m [36mfrom[39m [32m'@tiptap/extension-table-row'[39m[33m;[39m
+ [90m 10 |[39m [36mimport[39m [33mTableCell[39m [36mfrom[39m [32m'@tiptap/extension-table-cell'[39m[33m;[39m
+ [90m 11 |[39m [36mimport[39m [33mTableHeader[39m [36mfrom[39m [32m'@tiptap/extension-table-header'[39m[33m;[39m[0m
+
+The export default was not found in module [project]/node_modules/@tiptap/extension-table/dist/index.js [app-client] (ecmascript).
+Did you mean to import updateColumns?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/ui/rich-text-editor.tsx [Client Component Browser]
+    ./src/features/posts/components/post-form.tsx [Client Component Browser]
+    ./src/app/dashboard/posts/[id]/edit/page.tsx [Client Component Browser]
+    ./src/app/dashboard/posts/[id]/edit/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/ui/rich-text-editor.tsx [Client Component SSR]
+    ./src/features/posts/components/post-form.tsx [Client Component SSR]
+    ./src/app/dashboard/posts/[id]/edit/page.tsx [Client Component SSR]
+    ./src/app/dashboard/posts/[id]/edit/page.tsx [Server Component]
+
+
+./src/components/ui/rich-text-editor.tsx:7:1
+Export default doesn't exist in target module
+[0m [90m  5 |[39m [36mimport[39m [33mImage[39m [36mfrom[39m [32m'@tiptap/extension-image'[39m[33m;[39m
+ [90m  6 |[39m [36mimport[39m [33mLink[39m [36mfrom[39m [32m'@tiptap/extension-link'[39m[33m;[39m
+[31m[1m>[22m[39m[90m  7 |[39m [36mimport[39m [33mTable[39m [36mfrom[39m [32m'@tiptap/extension-table'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m  8 |[39m [36mimport[39m [33mTableRow[39m [36mfrom[39m [32m'@tiptap/extension-table-row'[39m[33m;[39m
+ [90m  9 |[39m [36mimport[39m [33mTableCell[39m [36mfrom[39m [32m'@tiptap/extension-table-cell'[39m[33m;[39m
+ [90m 10 |[39m [36mimport[39m [33mTableHeader[39m [36mfrom[39m [32m'@tiptap/extension-table-header'[39m[33m;[39m[0m
+
+The export default was not found in module [project]/node_modules/@tiptap/extension-table/dist/index.js [app-ssr] (ecmascript).
+Did you mean to import updateColumns?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/ui/rich-text-editor.tsx [Client Component Browser]
+    ./src/features/posts/components/post-form.tsx [Client Component Browser]
+    ./src/app/dashboard/posts/[id]/edit/page.tsx [Client Component Browser]
+    ./src/app/dashboard/posts/[id]/edit/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/ui/rich-text-editor.tsx [Client Component SSR]
+    ./src/features/posts/components/post-form.tsx [Client Component SSR]
+    ./src/app/dashboard/posts/[id]/edit/page.tsx [Client Component SSR]
+    ./src/app/dashboard/posts/[id]/edit/page.tsx [Server Component]
+
+
+    at <unknown> (./src/components/ui/rich-text-editor.tsx:8:1)
+    at <unknown> (./src/components/ui/rich-text-editor.tsx:7:1)

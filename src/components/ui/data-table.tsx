@@ -21,6 +21,8 @@ interface Column<T> {
     className?: string;
 }
 
+import { Checkbox } from "@/components/ui/checkbox";
+
 interface DataTableProps<T> {
     data: T[];
     columns: Column<T>[];
@@ -36,6 +38,10 @@ interface DataTableProps<T> {
         placeholder?: string;
     };
     actions?: React.ReactNode;
+    enableSelection?: boolean;
+    selectedIds?: (string | number)[];
+    onSelectionChange?: (ids: (string | number)[]) => void;
+    bulkActions?: React.ReactNode;
 }
 
 export function DataTable<T extends { id: string | number }>({
@@ -45,23 +51,57 @@ export function DataTable<T extends { id: string | number }>({
     pagination,
     search,
     actions,
+    enableSelection,
+    selectedIds = [],
+    onSelectionChange,
+    bulkActions,
 }: DataTableProps<T>) {
+    const handleSelectAll = (checked: boolean) => {
+        if (checked) {
+            onSelectionChange?.(data.map((item) => item.id));
+        } else {
+            onSelectionChange?.([]);
+        }
+    };
+
+    const handleSelectOne = (id: string | number, checked: boolean) => {
+        if (checked) {
+            onSelectionChange?.([...selectedIds, id]);
+        } else {
+            onSelectionChange?.(selectedIds.filter((selectedId) => selectedId !== id));
+        }
+    };
+
+    const allSelected = data.length > 0 && data.every((item) => selectedIds.includes(item.id));
+    const someSelected = data.some((item) => selectedIds.includes(item.id)) && !allSelected;
+
     return (
         <div className="space-y-4">
             {/* Toolbar */}
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-                {search && (
-                    <div className="relative w-full sm:w-72">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <Input
-                            type="text"
-                            value={search.value}
-                            onChange={(e) => search.onChange(e.target.value)}
-                            placeholder={search.placeholder || "Search..."}
-                            className="pl-9"
-                        />
-                    </div>
-                )}
+                <div className="flex items-center gap-4 w-full sm:w-auto">
+                    {search && (
+                        <div className="relative w-full sm:w-72">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input
+                                type="text"
+                                value={search.value}
+                                onChange={(e) => search.onChange(e.target.value)}
+                                placeholder={search.placeholder || "Search..."}
+                                className="pl-9"
+                            />
+                        </div>
+                    )}
+                    {selectedIds.length > 0 && bulkActions && (
+                        <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-5">
+                            <div className="h-8 w-px bg-border mx-2" />
+                            {bulkActions}
+                            <span className="text-sm text-muted-foreground ml-2">
+                                {selectedIds.length} selected
+                            </span>
+                        </div>
+                    )}
+                </div>
                 <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                     {actions}
                 </div>
@@ -72,6 +112,15 @@ export function DataTable<T extends { id: string | number }>({
                 <Table>
                     <TableHeader>
                         <TableRow>
+                            {enableSelection && (
+                                <TableHead className="w-[40px]">
+                                    <Checkbox
+                                        checked={allSelected}
+                                        onCheckedChange={handleSelectAll}
+                                        aria-label="Select all"
+                                    />
+                                </TableHead>
+                            )}
                             {columns.map((col, i) => (
                                 <TableHead key={i} className={col.className}>
                                     {col.header}
@@ -83,7 +132,7 @@ export function DataTable<T extends { id: string | number }>({
                         {isLoading ? (
                             <TableRow>
                                 <TableCell
-                                    colSpan={columns.length}
+                                    colSpan={columns.length + (enableSelection ? 1 : 0)}
                                     className="h-24 text-center"
                                 >
                                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
@@ -92,7 +141,7 @@ export function DataTable<T extends { id: string | number }>({
                         ) : data.length === 0 ? (
                             <TableRow>
                                 <TableCell
-                                    colSpan={columns.length}
+                                    colSpan={columns.length + (enableSelection ? 1 : 0)}
                                     className="h-24 text-center"
                                 >
                                     No results.
@@ -100,7 +149,16 @@ export function DataTable<T extends { id: string | number }>({
                             </TableRow>
                         ) : (
                             data.map((item) => (
-                                <TableRow key={item.id}>
+                                <TableRow key={item.id} data-state={selectedIds.includes(item.id) ? "selected" : undefined}>
+                                    {enableSelection && (
+                                        <TableCell>
+                                            <Checkbox
+                                                checked={selectedIds.includes(item.id)}
+                                                onCheckedChange={(checked) => handleSelectOne(item.id, checked as boolean)}
+                                                aria-label={`Select row ${item.id}`}
+                                            />
+                                        </TableCell>
+                                    )}
                                     {columns.map((col, i) => (
                                         <TableCell key={i}>
                                             {col.cell

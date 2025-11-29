@@ -1,35 +1,58 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { roleService } from "@/features/roles/services/role.service";
 import { Permission } from "@/features/roles/types";
 import { Shield } from "lucide-react";
+import { toast } from "sonner";
 
 export default function PermissionsPage() {
     const [permissions, setPermissions] = useState<Permission[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState("");
+    const [totalPages, setTotalPages] = useState(1);
+
+    const fetchPermissions = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const response = await roleService.getPermissions();
+            const data = (response as any).data || response;
+            const permissionsArray = Array.isArray(data) ? data : [];
+
+            // Client-side filtering and pagination
+            let filtered = permissionsArray;
+            if (search) {
+                const searchLower = search.toLowerCase();
+                filtered = permissionsArray.filter((perm: Permission) =>
+                    perm.name.toLowerCase().includes(searchLower) ||
+                    perm.resource?.toLowerCase().includes(searchLower) ||
+                    perm.action?.toLowerCase().includes(searchLower)
+                );
+            }
+
+            const limit = 20;
+            const total = Math.ceil(filtered.length / limit);
+            setTotalPages(total);
+
+            const start = (page - 1) * limit;
+            const end = start + limit;
+            setPermissions(filtered.slice(start, end));
+        } catch (error) {
+            console.error("Failed to fetch permissions:", error);
+            toast.error("Failed to fetch permissions");
+        } finally {
+            setIsLoading(false);
+        }
+    }, [page, search]);
 
     useEffect(() => {
-        const fetchPermissions = async () => {
-            try {
-                const response = await roleService.getPermissions();
-                // Assuming response is { data: Permission[] } or just Permission[]
-                // Based on previous checks, it seems to return the data directly or wrapped.
-                // roleService.getPermissions returns response.data.
-                // If response.data is { data: Permission[] }, then we need (response as any).data.
-                // If response.data is Permission[], then we use response.
-                // Let's assume it's { data: Permission[] } based on other services.
-                const data = (response as any).data || response;
-                setPermissions(Array.isArray(data) ? data : []);
-            } catch (error) {
-                console.error("Failed to fetch permissions:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchPermissions();
-    }, []);
+        const debounce = setTimeout(() => {
+            fetchPermissions();
+        }, 300);
+        return () => clearTimeout(debounce);
+    }, [fetchPermissions]);
 
     return (
         <div className="space-y-6">
@@ -43,6 +66,16 @@ export default function PermissionsPage() {
             <DataTable
                 data={permissions}
                 isLoading={isLoading}
+                search={{
+                    value: search,
+                    onChange: setSearch,
+                    placeholder: "Search permissions...",
+                }}
+                pagination={{
+                    currentPage: page,
+                    totalPages: totalPages,
+                    onPageChange: setPage,
+                }}
                 columns={[
                     {
                         header: "Permission Name",

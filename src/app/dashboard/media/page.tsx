@@ -20,8 +20,9 @@ export default function MediaPage() {
     const [media, setMedia] = useState<Media[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isUploading, setIsUploading] = useState(false);
-    const [page] = useState(1);
+    const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
+    const [totalPages, setTotalPages] = useState(1);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const fetchMedia = useCallback(async () => {
@@ -33,6 +34,7 @@ export default function MediaPage() {
                 search,
             });
             setMedia(response.data || []);
+            setTotalPages(response.meta?.total_pages || 1);
         } catch (error) {
             console.error("Failed to fetch media:", error);
         } finally {
@@ -179,6 +181,31 @@ export default function MediaPage() {
                             </CardContent>
                         </Card>
                     ))}
+                </div>
+            )}
+
+            {/* Pagination Controls */}
+            {!isLoading && media.length > 0 && totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-6">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((p: number) => Math.max(1, p - 1))}
+                        disabled={page === 1}
+                    >
+                        Previous
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                        Page {page} of {totalPages}
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((p: number) => Math.min(totalPages, p + 1))}
+                        disabled={page === totalPages}
+                    >
+                        Next
+                    </Button>
                 </div>
             )}
         </div>

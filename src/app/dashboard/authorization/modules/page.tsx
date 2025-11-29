@@ -1,20 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Module } from "@/features/authorization/types";
 import { authorizationService } from "@/features/authorization/authorization.service";
 import { Button } from "@/components/ui/button";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { DataTable } from "@/components/ui/data-table";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Loader2, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ModuleForm } from "@/features/authorization/components/module-form";
@@ -23,26 +15,37 @@ import { CreateModuleRequest, UpdateModuleRequest } from "@/features/authorizati
 export default function ModulesPage() {
     const [modules, setModules] = useState<Module[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState("");
+    const [totalPages, setTotalPages] = useState(1);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedModule, setSelectedModule] = useState<Module | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const fetchModules = async () => {
+    const fetchModules = useCallback(async () => {
         try {
             setLoading(true);
-            const result = await authorizationService.getModules({ page: 1, limit: 100 });
+            const result = await authorizationService.getModules({
+                page,
+                limit: 10,
+                search
+            });
             setModules(result.data);
+            setTotalPages(result.meta?.total_pages || 1);
         } catch (error) {
             console.error("Failed to fetch modules:", error);
             toast.error("Failed to load modules");
         } finally {
             setLoading(false);
         }
-    };
+    }, [page, search]);
 
     useEffect(() => {
-        fetchModules();
-    }, []);
+        const debounce = setTimeout(() => {
+            fetchModules();
+        }, 300);
+        return () => clearTimeout(debounce);
+    }, [fetchModules]);
 
     const handleDelete = async (id: number) => {
         if (!confirm("Are you sure you want to delete this module?")) return;
@@ -89,88 +92,88 @@ export default function ModulesPage() {
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">System Modules</h2>
+                <div>
+                    <h2 className="text-xl font-semibold">System Modules</h2>
+                    <p className="text-muted-foreground">Manage system modules and their configurations.</p>
+                </div>
                 <Button onClick={handleCreate}>
                     <Plus className="w-4 h-4 mr-2" />
                     Add Module
                 </Button>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Modules List</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {loading ? (
-                        <div className="flex justify-center p-8">
-                            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-                        </div>
-                    ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Code</TableHead>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Description</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>System</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {modules.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                                            No modules found
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    modules.map((module) => (
-                                        <TableRow key={module.id}>
-                                            <TableCell className="font-medium">{module.code}</TableCell>
-                                            <TableCell>{module.display_name || module.name}</TableCell>
-                                            <TableCell>{module.description}</TableCell>
-                                            <TableCell>
-                                                <Badge variant={module.is_active ? "default" : "secondary"}>
-                                                    {module.is_active ? "Active" : "Inactive"}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell>
-                                                {module.is_system && (
-                                                    <Badge variant="outline" className="border-blue-200 text-blue-700 bg-blue-50">
-                                                        System
-                                                    </Badge>
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex justify-end gap-2">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleEdit(module)}
-                                                    >
-                                                        <Edit className="w-4 h-4" />
-                                                    </Button>
-                                                    {!module.is_system && (
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                            onClick={() => handleDelete(module.id)}
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
+            <DataTable
+                data={modules}
+                isLoading={loading}
+                search={{
+                    value: search,
+                    onChange: setSearch,
+                    placeholder: "Search modules...",
+                }}
+                pagination={{
+                    currentPage: page,
+                    totalPages: totalPages,
+                    onPageChange: setPage,
+                }}
+                columns={[
+                    {
+                        header: "Code",
+                        accessorKey: "code",
+                        cell: (module) => <span className="font-medium">{module.code}</span>
+                    },
+                    {
+                        header: "Name",
+                        accessorKey: "name",
+                        cell: (module) => module.display_name || module.name
+                    },
+                    {
+                        header: "Description",
+                        accessorKey: "description",
+                    },
+                    {
+                        header: "Status",
+                        accessorKey: "is_active",
+                        cell: (module) => (
+                            <Badge variant={module.is_active ? "default" : "secondary"}>
+                                {module.is_active ? "Active" : "Inactive"}
+                            </Badge>
+                        )
+                    },
+                    {
+                        header: "System",
+                        accessorKey: "is_system",
+                        cell: (module) => module.is_system && (
+                            <Badge variant="outline" className="border-blue-200 text-blue-700 bg-blue-50">
+                                System
+                            </Badge>
+                        )
+                    },
+                    {
+                        header: "Actions",
+                        cell: (module) => (
+                            <div className="flex justify-end gap-2">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleEdit(module)}
+                                >
+                                    <Edit className="w-4 h-4" />
+                                </Button>
+                                {!module.is_system && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                        onClick={() => handleDelete(module.id)}
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
                                 )}
-                            </TableBody>
-                        </Table>
-                    )}
-                </CardContent>
-            </Card>
+                            </div>
+                        )
+                    }
+                ]}
+            />
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent>

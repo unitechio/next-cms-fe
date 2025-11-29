@@ -1,0 +1,25 @@
+
+> next-cms-fe@0.1.0 build
+> next build
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.5 (Turbopack)
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully in 19.4s
+   Running TypeScript ...
+Failed to compile.
+
+./src/app/dashboard/authorization/modules/page.tsx:31:17
+Type error: Object literal may only specify known properties, and 'search' does not exist in type 'PaginationParams'.
+
+[0m [90m 29 |[39m                 page[33m,[39m
+ [90m 30 |[39m                 limit[33m:[39m [35m10[39m[33m,[39m
+[31m[1m>[22m[39m[90m 31 |[39m                 search
+ [90m    |[39m                 [31m[1m^[22m[39m
+ [90m 32 |[39m             })[33m;[39m
+ [90m 33 |[39m             setModules(result[33m.[39mdata)[33m;[39m
+ [90m 34 |[39m             setTotalPages(result[33m.[39mmeta[33m?[39m[33m.[39mtotal_pages [33m||[39m [35m1[39m)[33m;[39m[0m
+Next.js build worker exited with code: 1 and signal: null
