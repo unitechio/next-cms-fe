@@ -1,0 +1,158 @@
+
+> next-cms-fe@0.1.0 lint
+> eslint
+
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\app\dashboard\profile\page.tsx
+  68:77  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\app\dashboard\users\[id]\edit\page.tsx
+  56:17  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\app\debug\page.tsx
+   8:48  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+   9:44  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  14:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\app\debug\page.tsx:14:9
+  12 |         // Check token
+  13 |         const token = Cookies.get("token");
+> 14 |         setTokenInfo({
+     |         ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  15 |             exists: !!token,
+  16 |             value: token ? `${token.substring(0, 30)}...` : "No token",
+  17 |             length: token?.length || 0,  react-hooks/set-state-in-effect
+  25:29  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\components\dashboard\overview-chart.tsx
+  58:13  warning  'theme' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\components\layout\sidebar\sidebar.tsx
+  162:22  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\components\layout\sidebar\sidebar.tsx:162:22
+  160 |                 </SheetTrigger>
+  161 |                 <SheetContent side="left" className="p-0 w-72 bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
+> 162 |                     <SidebarContent />
+      |                      ^^^^^^^^^^^^^^ This component is created during render
+  163 |                 </SheetContent>
+  164 |             </Sheet>
+  165 |
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\components\layout\sidebar\sidebar.tsx:79:28
+   77 |     const [open, setOpen] = useState(false);
+   78 |
+>  79 |     const SidebarContent = () => (
+      |                            ^^^^^^^
+>  80 |         <div className="flex flex-col h-full">
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  81 |             {/* Header */}
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 149 |         </div>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 150 |     );
+      | ^^^^^^ The component is created during render here
+  151 |
+  152 |     return (
+  153 |         <>       react-hooks/static-components
+  168:18  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\components\layout\sidebar\sidebar.tsx:168:18
+  166 |             {/* Desktop Sidebar */}
+  167 |             <aside className="hidden lg:block fixed top-0 left-0 z-50 h-screen w-72 bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
+> 168 |                 <SidebarContent />
+      |                  ^^^^^^^^^^^^^^ This component is created during render
+  169 |             </aside>
+  170 |         </>
+  171 |     );
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\components\layout\sidebar\sidebar.tsx:79:28
+   77 |     const [open, setOpen] = useState(false);
+   78 |
+>  79 |     const SidebarContent = () => (
+      |                            ^^^^^^^
+>  80 |         <div className="flex flex-col h-full">
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  81 |             {/* Header */}
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 149 |         </div>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 150 |     );
+      | ^^^^^^ The component is created during render here
+  151 |
+  152 |     return (
+  153 |         <>  react-hooks/static-components
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\features\authorization\components\department-form.tsx
+  63:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\features\authorization\components\module-form.tsx
+  43:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\features\authorization\components\scope-form.tsx
+  47:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\features\authorization\components\service-form.tsx
+  64:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\features\notifications\components\notification-list.tsx
+  6:10  warning  'Separator' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\features\notifications\hooks\useNotifications.ts
+  34:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\features\notifications\hooks\useWebSocket.ts
+  90:13  error  Error: Cannot access variable before it is declared
+
+`connect` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\features\notifications\hooks\useWebSocket.ts:90:13
+  88 |           reconnectTimeoutRef.current = setTimeout(() => {
+  89 |             setReconnectAttempts((prev) => prev + 1);
+> 90 |             connect();
+     |             ^^^^^^^ `connect` accessed before it is declared
+  91 |           }, reconnectInterval);
+  92 |         }
+  93 |       };
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\features\notifications\hooks\useWebSocket.ts:31:3
+   29 |   const pingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+   30 |
+>  31 |   const connect = useCallback(() => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  32 |     try {
+      | ^^^^^^^^^
+>  33 |       const token = Cookies.get("token");
+      …
+      | ^^^^^^^^^
+> 106 |     reconnectInterval,
+      | ^^^^^^^^^
+> 107 |   ]);
+      | ^^^^^^ `connect` is declared here
+  108 |
+  109 |   const disconnect = useCallback(() => {
+  110 |     if (reconnectTimeoutRef.current) {  react-hooks/immutability
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\features\notifications\notification.service.ts
+  105:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\features\notifications\types.ts
+  26:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  39:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  49:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  92:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 21 problems (19 errors, 2 warnings)
+

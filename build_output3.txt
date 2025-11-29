@@ -1,0 +1,29 @@
+
+> next-cms-fe@0.1.0 build
+> next build
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.5 (Turbopack)
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully in 8.0s
+   Running TypeScript ...
+Failed to compile.
+
+./src/app/dashboard/users/new/page.tsx:37:9
+Type error: Type 'Resolver<{ first_name: string; last_name: string; email: string; role: string; password?: string | undefined; status?: "active" | "inactive" | "banned" | undefined; }, any, { first_name: string; ... 4 more ...; password?: string | undefined; }>' is not assignable to type 'Resolver<{ first_name: string; last_name: string; email: string; role: string; status: "active" | "inactive" | "banned"; password?: string | undefined; }, any, { first_name: string; last_name: string; email: string; role: string; status: "active" | ... 1 more ... | "banned"; password?: string | undefined; }>'.
+  Types of parameters 'options' and 'options' are incompatible.
+    Type 'ResolverOptions<{ first_name: string; last_name: string; email: string; role: string; status: "active" | "inactive" | "banned"; password?: string | undefined; }>' is not assignable to type 'ResolverOptions<{ first_name: string; last_name: string; email: string; role: string; password?: string | undefined; status?: "active" | "inactive" | "banned" | undefined; }>'.
+      Type '"active" | "inactive" | "banned" | undefined' is not assignable to type '"active" | "inactive" | "banned"'.
+        Type 'undefined' is not assignable to type '"active" | "inactive" | "banned"'.
+
+[0m [90m 35 |[39m
+ [90m 36 |[39m     [36mconst[39m form [33m=[39m useForm[33m<[39m[33mz[39m[33m.[39minfer[33m<[39m[36mtypeof[39m [33mUserSchema[39m[33m>>[39m({
+[31m[1m>[22m[39m[90m 37 |[39m         resolver[33m:[39m zodResolver([33mUserSchema[39m)[33m,[39m
+ [90m    |[39m         [31m[1m^[22m[39m
+ [90m 38 |[39m         defaultValues[33m:[39m {
+ [90m 39 |[39m             first_name[33m:[39m [32m""[39m[33m,[39m
+ [90m 40 |[39m             last_name[33m:[39m [32m""[39m[33m,[39m[0m
+Next.js build worker exited with code: 1 and signal: null
