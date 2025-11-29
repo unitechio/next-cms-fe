@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ServiceForm } from "@/features/authorization/components/service-form";
 import { CreateServiceRequest, UpdateServiceRequest } from "@/features/authorization/types";
 
+
 export default function ServicesPage() {
     const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState(true);
