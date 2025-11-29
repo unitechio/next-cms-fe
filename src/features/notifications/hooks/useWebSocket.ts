@@ -1,50 +1,152 @@
-'use client';
+import { useEffect, useRef, useState, useCallback } from "react";
+import { WebSocketMessage, WebSocketEventType } from "../types";
+import { notificationService } from "../notification.service";
+import Cookies from "js-cookie";
 
-import { useEffect, useRef } from 'react';
-
-const WEBSOCKET_URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'ws://localhost:8080/ws';
-
-interface WebSocketHookProps {
-  onMessage: (message: any) => void;
+interface UseWebSocketOptions {
+  onMessage?: (message: WebSocketMessage) => void;
+  onConnect?: () => void;
+  onDisconnect?: () => void;
+  onError?: (error: Event) => void;
+  reconnectInterval?: number;
+  maxReconnectAttempts?: number;
 }
 
-export function useWebSocket({ onMessage }: WebSocketHookProps) {
-  const ws = useRef<WebSocket | null>(null);
+export function useWebSocket(options: UseWebSocketOptions = {}) {
+  const {
+    onMessage,
+    onConnect,
+    onDisconnect,
+    onError,
+    reconnectInterval = 3000,
+    maxReconnectAttempts = 5,
+  } = options;
 
-  useEffect(() => {
-    const connect = () => {
-      ws.current = new WebSocket(WEBSOCKET_URL);
+  const [isConnected, setIsConnected] = useState(false);
+  const [reconnectAttempts, setReconnectAttempts] = useState(0);
+  const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-      ws.current.onopen = () => {
-        console.log('WebSocket connected');
+  const connect = useCallback(() => {
+    try {
+      const token = Cookies.get("token");
+      if (!token) {
+        console.warn("No access token found, skipping WebSocket connection");
+        // return;
+      }
+
+      const wsUrl = `${notificationService.getWebSocketUrl()}?token=${token}`;
+      const ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        console.log("WebSocket connected");
+        setIsConnected(true);
+        setReconnectAttempts(0);
+        onConnect?.();
+
+        // Start ping interval to keep connection alive
+        pingIntervalRef.current = setInterval(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(
+              JSON.stringify({
+                type: WebSocketEventType.PING,
+                payload: {},
+                timestamp: new Date().toISOString(),
+              })
+            );
+          }
+        }, 30000); // Ping every 30 seconds
       };
 
-      ws.current.onmessage = (event) => {
+      ws.onmessage = (event) => {
         try {
-          const message = JSON.parse(event.data);
-          onMessage(message);
+          const message: WebSocketMessage = JSON.parse(event.data);
+          onMessage?.(message);
         } catch (error) {
-          console.error('Failed to parse WebSocket message:', error);
+          console.error("Failed to parse WebSocket message:", error);
         }
       };
 
-      ws.current.onclose = () => {
-        console.log('WebSocket disconnected, attempting to reconnect...');
-        setTimeout(connect, 3000); // Reconnect after 3 seconds
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        onError?.(error);
       };
 
-      ws.current.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        ws.current?.close();
-      };
-    };
+      ws.onclose = () => {
+        console.log("WebSocket disconnected");
+        setIsConnected(false);
+        onDisconnect?.();
 
-    connect();
+        // Clear ping interval
+        if (pingIntervalRef.current) {
+          clearInterval(pingIntervalRef.current);
+        }
+
+        // Trigger reconnection via state change
+        if (reconnectAttempts < maxReconnectAttempts) {
+             setReconnectAttempts((prev) => prev + 1);
+        }
+      };
+
+      wsRef.current = ws;
+    } catch (error) {
+      console.error("Failed to create WebSocket connection:", error);
+    }
+  }, [
+    onConnect,
+    onDisconnect,
+    onError,
+    onMessage,
+    // Remove reconnectAttempts from dependencies to avoid recreation loops
+    maxReconnectAttempts,
+  ]);
+
+  // Handle reconnection
+  useEffect(() => {
+    if (reconnectAttempts > 0) {
+        const timeout = setTimeout(() => {
+            connect();
+        }, reconnectInterval);
+        return () => clearTimeout(timeout);
+    }
+  }, [reconnectAttempts, reconnectInterval, connect]);
+
+  const disconnect = useCallback(() => {
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+    }
+    if (pingIntervalRef.current) {
+      clearInterval(pingIntervalRef.current);
+    }
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+    setIsConnected(false);
+  }, []);
+
+  const sendMessage = useCallback((message: WebSocketMessage) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(message));
+    } else {
+      console.warn("WebSocket is not connected");
+    }
+  }, []);
+
+  useEffect(() => {
+    // Temporarily disabled - WebSocket server not running
+    // connect();
 
     return () => {
-      ws.current?.close();
+      disconnect();
     };
-  }, [onMessage]);
+  }, [connect, disconnect]);
 
-  return null;
+  return {
+    isConnected,
+    sendMessage,
+    reconnect: connect,
+    disconnect,
+  };
 }
