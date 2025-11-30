@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ServiceForm } from "@/features/authorization/components/service-form";
 import { CreateServiceRequest, UpdateServiceRequest } from "@/features/authorization/types";
+import { parseApiResponse } from "@/lib/api-utils";
 
 
 export default function ServicesPage() {
@@ -26,16 +27,18 @@ export default function ServicesPage() {
     const fetchServices = useCallback(async () => {
         try {
             setLoading(true);
-            const result = await authorizationService.getServices({
+            const response = await authorizationService.getServices({
                 page,
                 limit: 10,
                 search
             });
-            setServices(result.data);
-            setTotalPages(result.meta?.total_pages || 1);
+            const { data, totalPages: pages } = parseApiResponse<Service>(response);
+            setServices(data);
+            setTotalPages(pages);
         } catch (error) {
             console.error("Failed to fetch services:", error);
             toast.error("Failed to load services");
+            setServices([]);
         } finally {
             setLoading(false);
         }

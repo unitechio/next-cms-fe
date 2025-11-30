@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ModuleForm } from "@/features/authorization/components/module-form";
 import { CreateModuleRequest, UpdateModuleRequest } from "@/features/authorization/types";
+import { parseApiResponse } from "@/lib/api-utils";
 
 export default function ModulesPage() {
     const [modules, setModules] = useState<Module[]>([]);
@@ -25,16 +26,18 @@ export default function ModulesPage() {
     const fetchModules = useCallback(async () => {
         try {
             setLoading(true);
-            const result = await authorizationService.getModules({
+            const response = await authorizationService.getModules({
                 page,
                 limit: 10,
                 search
             });
-            setModules(result.data);
-            setTotalPages(result.meta?.total_pages || 1);
+            const { data, totalPages: pages } = parseApiResponse<Module>(response);
+            setModules(data);
+            setTotalPages(pages);
         } catch (error) {
             console.error("Failed to fetch modules:", error);
             toast.error("Failed to load modules");
+            setModules([]);
         } finally {
             setLoading(false);
         }

@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScopeForm } from "@/features/authorization/components/scope-form";
 import { CreateScopeRequest, UpdateScopeRequest } from "@/features/authorization/types";
+import { parseApiResponse } from "@/lib/api-utils";
 
 export default function ScopesPage() {
     const [scopes, setScopes] = useState<Scope[]>([]);
@@ -25,16 +26,18 @@ export default function ScopesPage() {
     const fetchScopes = useCallback(async () => {
         try {
             setLoading(true);
-            const result = await authorizationService.getScopes({
+            const response = await authorizationService.getScopes({
                 page,
                 limit: 10,
                 search
             });
-            setScopes(result.data);
-            setTotalPages(result.meta?.total_pages || 1);
+            const { data, totalPages: pages } = parseApiResponse<Scope>(response);
+            setScopes(data);
+            setTotalPages(pages);
         } catch (error) {
             console.error("Failed to fetch scopes:", error);
             toast.error("Failed to load scopes");
+            setScopes([]);
         } finally {
             setLoading(false);
         }

@@ -33,7 +33,7 @@ export default function PermissionsPage() {
             }
 
             const limit = 20;
-            const total = Math.ceil(filtered.length / limit);
+            const total = filtered.length > 0 ? Math.ceil(filtered.length / limit) : 1;
             setTotalPages(total);
 
             const start = (page - 1) * limit;
@@ -42,6 +42,8 @@ export default function PermissionsPage() {
         } catch (error) {
             console.error("Failed to fetch permissions:", error);
             toast.error("Failed to fetch permissions");
+            setPermissions([]); // Set empty array on error
+            setTotalPages(1);
         } finally {
             setIsLoading(false);
         }
