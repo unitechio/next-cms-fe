@@ -22,4 +22,23 @@ export const auditLogService = {
     const response = await apiClient.get<AuditLog>(`/audit-logs/${id}`);
     return response.data;
   },
+
+  exportAuditLogs: async (filters: AuditLogFilters) => {
+    const params = new URLSearchParams({
+      page: filters.page.toString(),
+      limit: filters.limit.toString(),
+    });
+    if (filters.search) params.append('search', filters.search);
+    if (filters.user_id) params.append('user_id', filters.user_id);
+    if (filters.action) params.append('action', filters.action);
+    if (filters.resource) params.append('resource', filters.resource);
+    if (filters.start_date) params.append('start_date', filters.start_date);
+    if (filters.end_date) params.append('end_date', filters.end_date);
+
+    const response = await apiClient.get(
+      `/audit-logs/export?${params.toString()}`,
+      { responseType: 'blob' }
+    );
+    return response.data;
+  },
 };

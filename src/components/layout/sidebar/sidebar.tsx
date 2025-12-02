@@ -15,6 +15,7 @@ import {
   Database,
   Lock,
   Bell,
+  FolderOpen,
 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "@/components/ui/button";
@@ -46,10 +47,21 @@ const sidebarItems = [
     icon: Database,
   },
   {
-    title: "Roles & Permissions",
+    title: "Documents",
+    href: "/dashboard/documents",
+    icon: FolderOpen,
+  },
+  {
+    title: "Roles",
     href: "/dashboard/roles",
     icon: Shield,
   },
+  {
+    title: "Permissions",
+    href: "/dashboard/permissions",
+    icon: Shield,
+  },
+
   {
     title: "Authorization",
     href: "/dashboard/authorization/modules",

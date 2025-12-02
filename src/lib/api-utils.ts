@@ -39,6 +39,13 @@ export function parseApiResponse<T>(response: any): {
     else if (mainData?.meta?.total && mainData?.meta?.limit) {
         totalPages = Math.ceil(mainData.meta.total / mainData.meta.limit);
     }
+    // Format 3: { meta: { pagination: { total, per_page, last_page } } }
+    else if (mainData?.meta?.pagination?.last_page) {
+        totalPages = mainData.meta.pagination.last_page;
+    }
+    else if (mainData?.meta?.pagination?.total && mainData?.meta?.pagination?.per_page) {
+        totalPages = Math.ceil(mainData.meta.pagination.total / mainData.meta.pagination.per_page);
+    }
     
     return { data, totalPages };
 }

@@ -34,4 +34,25 @@ export const userService = {
   deleteUser: async (id: string) => {
     await apiClient.delete(`/users/${id}`);
   },
+
+  // User-Role Management
+  getUserRoles: async (userId: string) => {
+    const response = await apiClient.get<ApiResponse<any[]>>(`/users/${userId}/roles`);
+    return response.data;
+  },
+
+  assignRole: async (userId: string, roleId: number) => {
+    const response = await apiClient.post(`/users/${userId}/roles`, { role_id: roleId });
+    return response.data;
+  },
+
+  removeRole: async (userId: string, roleId: number) => {
+    await apiClient.delete(`/users/${userId}/roles/${roleId}`);
+  },
+
+  // User Permissions
+  getUserPermissions: async (userId: string) => {
+    const response = await apiClient.get<ApiResponse<any[]>>(`/users/${userId}/permissions`);
+    return response.data;
+  },
 };

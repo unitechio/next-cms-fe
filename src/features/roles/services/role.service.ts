@@ -37,4 +37,19 @@ export const roleService = {
     const response = await apiClient.get<{ data: Permission[] }>('/permissions');
     return response.data;
   },
+
+  // Role-Permission Management
+  getRolePermissions: async (roleId: string) => {
+    const response = await apiClient.get<ApiResponse<Permission[]>>(`/roles/${roleId}/permissions`);
+    return response.data;
+  },
+
+  assignPermission: async (roleId: string, permissionId: number) => {
+    const response = await apiClient.post(`/roles/${roleId}/permissions`, { permission_id: permissionId });
+    return response.data;
+  },
+
+  removePermission: async (roleId: string, permissionId: number) => {
+    await apiClient.delete(`/roles/${roleId}/permissions/${permissionId}`);
+  },
 };

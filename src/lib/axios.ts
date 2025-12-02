@@ -14,12 +14,19 @@ apiClient.interceptors.request.use(
   (config) => {
     // Try to get token from cookies first, then localStorage as fallback
     let token = Cookies.get('token');
+    console.log('📤 API Request:', config.url);
+    console.log('🔑 Token from cookies:', token ? 'EXISTS' : 'NONE');
+    
     if (!token && typeof window !== 'undefined') {
       token = localStorage.getItem('token') || undefined;
+      console.log('🔑 Token from localStorage:', token ? 'EXISTS' : 'NONE');
     }
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('✅ Authorization header set');
+    } else {
+      console.log('❌ No token available');
     }
     return config;
   },
@@ -35,7 +42,7 @@ apiClient.interceptors.response.use(
     
     // Log 401 errors for debugging
     if (error.response?.status === 401) {
-      console.error('401 Unauthorized error:', {
+      console.error('❌ 401 UNAUTHORIZED ERROR - DETAILS:', {
         url: originalRequest?.url,
         method: originalRequest?.method,
         hasToken: !!Cookies.get('token'),

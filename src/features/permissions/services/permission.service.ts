@@ -38,4 +38,18 @@ export const permissionService = {
     const response = await apiClient.get<Permission[]>(`/permissions/resource/${resource}`);
     return response.data;
   },
+
+  createPermission: async (data: { name: string; resource: string; action: string; description?: string }) => {
+    const response = await apiClient.post<ApiResponse<Permission>>('/permissions', data);
+    return response.data;
+  },
+
+  updatePermission: async (id: number, data: { name?: string; resource?: string; action?: string; description?: string }) => {
+    const response = await apiClient.put<ApiResponse<Permission>>(`/permissions/${id}`, data);
+    return response.data;
+  },
+
+  deletePermission: async (id: number) => {
+    await apiClient.delete(`/permissions/${id}`);
+  },
 };

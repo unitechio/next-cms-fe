@@ -8,22 +8,27 @@ import {
     File as FileIcon,
     Loader2,
     Trash2,
-    Search,
 } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
+import { toast } from "sonner";
+import { MediaFilters } from "@/features/media/components/media-filters";
+import { MediaDetail } from "@/features/media/components/media-detail";
+import { parseApiResponse } from "@/lib/api-utils";
 
 export default function MediaPage() {
     const [media, setMedia] = useState<Media[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isUploading, setIsUploading] = useState(false);
     const [page, setPage] = useState(1);
-    const [search, setSearch] = useState("");
     const [totalPages, setTotalPages] = useState(1);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [filters, setFilters] = useState({});
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
+    const [detailOpen, setDetailOpen] = useState(false);
 
     const fetchMedia = useCallback(async () => {
         setIsLoading(true);
@@ -31,16 +36,17 @@ export default function MediaPage() {
             const response = await mediaService.getMedia({
                 page,
                 limit: 20,
-                search,
+                ...filters,
             });
-            setMedia(response.data || []);
-            setTotalPages(response.meta?.total_pages || 1);
+            const { data, totalPages: pages } = parseApiResponse<Media>(response);
+            setMedia(data);
+            setTotalPages(pages);
         } catch (error) {
             console.error("Failed to fetch media:", error);
         } finally {
             setIsLoading(false);
         }
-    }, [page, search]);
+    }, [page, filters]);
 
     useEffect(() => {
         const debounce = setTimeout(() => {
@@ -57,8 +63,10 @@ export default function MediaPage() {
         try {
             await mediaService.uploadMedia(file);
             fetchMedia();
+            toast.success("File uploaded successfully");
         } catch (error) {
             console.error("Failed to upload media:", error);
+            toast.error("Failed to upload file");
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) {
@@ -72,9 +80,31 @@ export default function MediaPage() {
         try {
             await mediaService.deleteMedia(id);
             setMedia(media.filter((m) => m.id !== id));
+            setSelectedIds(selectedIds.filter(sid => sid !== id));
+            toast.success("File deleted successfully");
         } catch (error) {
             console.error("Failed to delete media:", error);
+            toast.error("Failed to delete file");
         }
+    };
+
+    const handleBulkDelete = async () => {
+        if (!confirm(`Are you sure you want to delete ${selectedIds.length} files?`)) return;
+        try {
+            await Promise.all(selectedIds.map(id => mediaService.deleteMedia(id)));
+            setMedia(media.filter((m) => !selectedIds.includes(m.id)));
+            setSelectedIds([]);
+            toast.success("Files deleted successfully");
+        } catch (error) {
+            console.error("Failed to delete media:", error);
+            toast.error("Failed to delete some files");
+        }
+    };
+
+    const toggleSelection = (id: string) => {
+        setSelectedIds(prev =>
+            prev.includes(id) ? prev.filter(sid => sid !== id) : [...prev, id]
+        );
     };
 
     const formatSize = (bytes: number) => {
@@ -93,16 +123,12 @@ export default function MediaPage() {
                     <p className="text-muted-foreground">Manage your uploaded files and assets.</p>
                 </div>
                 <div className="flex gap-3 w-full sm:w-auto">
-                    <div className="relative flex-1 sm:w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <Input
-                            type="text"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search files..."
-                            className="pl-9"
-                        />
-                    </div>
+                    {selectedIds.length > 0 && (
+                        <Button variant="destructive" onClick={handleBulkDelete}>
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete ({selectedIds.length})
+                        </Button>
+                    )}
                     <Button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isUploading}
@@ -123,6 +149,11 @@ export default function MediaPage() {
                 </div>
             </div>
 
+            <MediaFilters onFilterChange={(newFilters) => {
+                setFilters(prev => ({ ...prev, ...newFilters }));
+                setPage(1);
+            }} />
+
             {isLoading ? (
                 <div className="flex items-center justify-center py-20">
                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -136,8 +167,28 @@ export default function MediaPage() {
                     {media.map((item) => (
                         <Card
                             key={item.id}
-                            className="group relative hover:border-primary/50 transition-all overflow-hidden"
+                            className={`group relative transition-all overflow-hidden cursor-pointer ${selectedIds.includes(item.id) ? 'ring-2 ring-primary' : 'hover:border-primary/50'
+                                }`}
+                            onClick={() => {
+                                setSelectedMedia(item);
+                                setDetailOpen(true);
+                            }}
                         >
+                            <div
+                                className="absolute top-2 left-2 z-10"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleSelection(item.id);
+                                }}
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={selectedIds.includes(item.id)}
+                                    onChange={() => { }} // Handled by div click
+                                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                />
+                            </div>
+
                             <CardContent className="p-3">
                                 <div className="aspect-square rounded-lg bg-muted mb-3 overflow-hidden relative">
                                     {item.mime_type.startsWith("image/") ? (
@@ -152,18 +203,6 @@ export default function MediaPage() {
                                             <FileIcon className="w-12 h-12" />
                                         </div>
                                     )}
-
-                                    {/* Overlay Actions */}
-                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                        <Button
-                                            variant="destructive"
-                                            size="icon"
-                                            className="rounded-full h-8 w-8"
-                                            onClick={() => handleDelete(item.id)}
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
-                                    </div>
                                 </div>
 
                                 <div className="space-y-1">
@@ -208,6 +247,13 @@ export default function MediaPage() {
                     </Button>
                 </div>
             )}
+
+            <MediaDetail
+                media={selectedMedia}
+                open={detailOpen}
+                onOpenChange={setDetailOpen}
+                onDelete={handleDelete}
+            />
         </div>
     );
 }

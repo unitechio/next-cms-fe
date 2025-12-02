@@ -23,10 +23,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const initAuth = async () => {
+            console.log('🔐 Auth init started');
             // Try to get token from cookies first, then localStorage as fallback
             let token = Cookies.get('token');
+            console.log('🔑 Token from cookies:', token ? 'EXISTS' : 'NONE');
+
             if (!token && typeof window !== 'undefined') {
                 token = localStorage.getItem('token') || undefined;
+                console.log('🔑 Token from localStorage:', token ? 'EXISTS' : 'NONE');
                 // If found in localStorage, sync it back to cookies
                 if (token) {
                     Cookies.set('token', token, {
@@ -39,15 +43,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (token) {
                 try {
+                    console.log('✅ Token found, verifying...');
                     // Verify token by fetching user profile
                     const user = await authService.getMe();
+                    console.log('✅ User verified:', user.email);
                     setState({
                         user,
                         isAuthenticated: true,
                         isLoading: false,
                     });
                 } catch (error) {
-                    console.error("Auth initialization failed:", error);
+                    console.error("❌ Auth initialization failed:", error);
                     // Token invalid or expired - clear both storage locations
                     Cookies.remove('token');
                     if (typeof window !== 'undefined') {
@@ -61,6 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     });
                 }
             } else {
+                console.log('❌ No token found');
                 setState({
                     user: null,
                     isAuthenticated: false,

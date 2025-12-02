@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { userService } from "@/features/users/services/user.service";
 import { User } from "@/features/users/types";
-import { MoreVertical, Plus } from "lucide-react";
+import { MoreVertical, Plus, Shield, UserCog } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { parseApiResponse } from "@/lib/api-utils";
 import { toast } from "sonner";
+import { UserRoleAssignment } from "@/features/users/components/user-role-assignment";
+import { UserPermissionsView } from "@/features/users/components/user-permissions-view";
+
 
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);
@@ -105,12 +108,19 @@ export default function UsersPage() {
                         ),
                     },
                     {
-                        header: "Role",
-                        accessorKey: "role",
+                        header: "Roles",
                         cell: (user) => (
-                            <Badge variant="outline" className="capitalize">
-                                {user.role}
-                            </Badge>
+                            <div className="flex flex-wrap gap-1">
+                                {user.roles && user.roles.length > 0 ? (
+                                    user.roles.map((role) => (
+                                        <Badge key={role.id} variant="outline" className="capitalize">
+                                            {role.name}
+                                        </Badge>
+                                    ))
+                                ) : (
+                                    <span className="text-xs text-muted-foreground">No roles</span>
+                                )}
+                            </div>
                         ),
                     },
                     {

@@ -29,7 +29,9 @@ import {
     Code2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import { DocumentLibraryModal } from '@/features/documents/components/document-library-modal';
+import { EntityType } from '@/features/documents/types';
 
 const lowlight = createLowlight(all);
 
@@ -37,9 +39,11 @@ interface RichTextEditorProps {
     content: string;
     onChange: (content: string) => void;
     placeholder?: string;
+    entityType?: EntityType;
+    entityId?: number;
 }
 
-export function RichTextEditor({ content, onChange, placeholder }: RichTextEditorProps) {
+export function RichTextEditor({ content, onChange, placeholder, entityType = 'general', entityId }: RichTextEditorProps) {
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -75,14 +79,26 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
                 class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none min-h-[300px] max-w-none p-4',
             },
         },
+        immediatelyRender: false,
     });
 
+    const [documentModalOpen, setDocumentModalOpen] = useState(false);
+
     const addImage = useCallback(() => {
-        const url = window.prompt('Enter image URL:');
-        if (url && editor) {
-            editor.chain().focus().setImage({ src: url }).run();
+        setDocumentModalOpen(true);
+    }, []);
+
+    const handleDocumentSelect = (url: string, type: 'image' | 'file') => {
+        if (editor) {
+            if (type === 'image') {
+                editor.chain().focus().setImage({ src: url }).run();
+            } else {
+                // For non-image files, insert as a link
+                const fileName = url.split('/').pop() || 'Download';
+                editor.chain().focus().insertContent(`<a href="${url}" target="_blank" rel="noopener noreferrer">${fileName}</a>`).run();
+            }
         }
-    }, [editor]);
+    };
 
     const setLink = useCallback(() => {
         const url = window.prompt('Enter URL:');
@@ -102,140 +118,149 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
     }
 
     return (
-        <div className="border rounded-lg overflow-hidden">
-            <div className="bg-muted/50 border-b p-2 flex flex-wrap gap-1">
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => editor.chain().focus().toggleBold().run()}
-                    className={editor.isActive('bold') ? 'bg-muted' : ''}
-                >
-                    <Bold className="h-4 w-4" />
-                </Button>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => editor.chain().focus().toggleItalic().run()}
-                    className={editor.isActive('italic') ? 'bg-muted' : ''}
-                >
-                    <Italic className="h-4 w-4" />
-                </Button>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => editor.chain().focus().toggleStrike().run()}
-                    className={editor.isActive('strike') ? 'bg-muted' : ''}
-                >
-                    <Strikethrough className="h-4 w-4" />
-                </Button>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => editor.chain().focus().toggleCode().run()}
-                    className={editor.isActive('code') ? 'bg-muted' : ''}
-                >
-                    <Code className="h-4 w-4" />
-                </Button>
-                <div className="w-px bg-border mx-1" />
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-                    className={editor.isActive('heading', { level: 1 }) ? 'bg-muted' : ''}
-                >
-                    <Heading1 className="h-4 w-4" />
-                </Button>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                    className={editor.isActive('heading', { level: 2 }) ? 'bg-muted' : ''}
-                >
-                    <Heading2 className="h-4 w-4" />
-                </Button>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-                    className={editor.isActive('heading', { level: 3 }) ? 'bg-muted' : ''}
-                >
-                    <Heading3 className="h-4 w-4" />
-                </Button>
-                <div className="w-px bg-border mx-1" />
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => editor.chain().focus().toggleBulletList().run()}
-                    className={editor.isActive('bulletList') ? 'bg-muted' : ''}
-                >
-                    <List className="h-4 w-4" />
-                </Button>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                    className={editor.isActive('orderedList') ? 'bg-muted' : ''}
-                >
-                    <ListOrdered className="h-4 w-4" />
-                </Button>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                    className={editor.isActive('blockquote') ? 'bg-muted' : ''}
-                >
-                    <Quote className="h-4 w-4" />
-                </Button>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                    className={editor.isActive('codeBlock') ? 'bg-muted' : ''}
-                >
-                    <Code2 className="h-4 w-4" />
-                </Button>
-                <div className="w-px bg-border mx-1" />
-                <Button type="button" variant="ghost" size="icon" onClick={setLink}>
-                    <Link2 className="h-4 w-4" />
-                </Button>
-                <Button type="button" variant="ghost" size="icon" onClick={addImage}>
-                    <ImageIcon className="h-4 w-4" />
-                </Button>
-                <Button type="button" variant="ghost" size="icon" onClick={addTable}>
-                    <TableIcon className="h-4 w-4" />
-                </Button>
-                <div className="w-px bg-border mx-1" />
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => editor.chain().focus().undo().run()}
-                    disabled={!editor.can().undo()}
-                >
-                    <Undo className="h-4 w-4" />
-                </Button>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => editor.chain().focus().redo().run()}
-                    disabled={!editor.can().redo()}
-                >
-                    <Redo className="h-4 w-4" />
-                </Button>
+        <>
+            <div className="border rounded-lg overflow-hidden">
+                <div className="bg-muted/50 border-b p-2 flex flex-wrap gap-1">
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleBold().run()}
+                        className={editor.isActive('bold') ? 'bg-muted' : ''}
+                    >
+                        <Bold className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleItalic().run()}
+                        className={editor.isActive('italic') ? 'bg-muted' : ''}
+                    >
+                        <Italic className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleStrike().run()}
+                        className={editor.isActive('strike') ? 'bg-muted' : ''}
+                    >
+                        <Strikethrough className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleCode().run()}
+                        className={editor.isActive('code') ? 'bg-muted' : ''}
+                    >
+                        <Code className="h-4 w-4" />
+                    </Button>
+                    <div className="w-px bg-border mx-1" />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                        className={editor.isActive('heading', { level: 1 }) ? 'bg-muted' : ''}
+                    >
+                        <Heading1 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                        className={editor.isActive('heading', { level: 2 }) ? 'bg-muted' : ''}
+                    >
+                        <Heading2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                        className={editor.isActive('heading', { level: 3 }) ? 'bg-muted' : ''}
+                    >
+                        <Heading3 className="h-4 w-4" />
+                    </Button>
+                    <div className="w-px bg-border mx-1" />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleBulletList().run()}
+                        className={editor.isActive('bulletList') ? 'bg-muted' : ''}
+                    >
+                        <List className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                        className={editor.isActive('orderedList') ? 'bg-muted' : ''}
+                    >
+                        <ListOrdered className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                        className={editor.isActive('blockquote') ? 'bg-muted' : ''}
+                    >
+                        <Quote className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                        className={editor.isActive('codeBlock') ? 'bg-muted' : ''}
+                    >
+                        <Code2 className="h-4 w-4" />
+                    </Button>
+                    <div className="w-px bg-border mx-1" />
+                    <Button type="button" variant="ghost" size="icon" onClick={setLink}>
+                        <Link2 className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" onClick={addImage}>
+                        <ImageIcon className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" onClick={addTable}>
+                        <TableIcon className="h-4 w-4" />
+                    </Button>
+                    <div className="w-px bg-border mx-1" />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().undo().run()}
+                        disabled={!editor.can().undo()}
+                    >
+                        <Undo className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().redo().run()}
+                        disabled={!editor.can().redo()}
+                    >
+                        <Redo className="h-4 w-4" />
+                    </Button>
+                </div>
+                <EditorContent editor={editor} />
             </div>
-            <EditorContent editor={editor} />
-        </div>
+            <DocumentLibraryModal
+                open={documentModalOpen}
+                onOpenChange={setDocumentModalOpen}
+                onSelect={handleDocumentSelect}
+                entityType={entityType}
+                entityId={entityId}
+            />
+        </>
     );
 }

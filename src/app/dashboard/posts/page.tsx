@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { DataTable } from "@/components/ui/data-table";
 import { postService } from "@/features/posts/services/post.service";
 import { Post } from "@/features/posts/types";
-import { Edit, MoreVertical, Plus, Trash2, FileText } from "lucide-react";
+import { Edit, MoreVertical, Plus, Trash2, FileText, Eye } from "lucide-react";
+import { PostFilters } from "@/features/posts/components/post-filters";
 import Link from "next/link";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -27,8 +28,8 @@ export default function PostsPage() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(1);
-    const [search, setSearch] = useState("");
     const [totalPages, setTotalPages] = useState(1);
+    const [filters, setFilters] = useState({});
 
     const fetchPosts = useCallback(async () => {
         setIsLoading(true);
@@ -36,7 +37,7 @@ export default function PostsPage() {
             const response = await postService.getPosts({
                 page,
                 limit: 10,
-                search,
+                ...filters,
             });
             const { data, totalPages: pages } = parseApiResponse<Post>(response);
             setPosts(data);
@@ -48,7 +49,7 @@ export default function PostsPage() {
         } finally {
             setIsLoading(false);
         }
-    }, [page, search]);
+    }, [page, filters]);
 
     useEffect(() => {
         const debounce = setTimeout(() => {
@@ -69,6 +70,10 @@ export default function PostsPage() {
         }
     };
 
+    const handlePreview = (post: Post) => {
+        window.open(`/blog/${post.slug}`, '_blank');
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -84,14 +89,14 @@ export default function PostsPage() {
                 </Button>
             </div>
 
+            <PostFilters onFilterChange={(newFilters) => {
+                setFilters(prev => ({ ...prev, ...newFilters }));
+                setPage(1); // Reset to first page on filter change
+            }} />
+
             <DataTable
                 data={posts}
                 isLoading={isLoading}
-                search={{
-                    value: search,
-                    onChange: setSearch,
-                    placeholder: "Search posts...",
-                }}
                 pagination={{
                     currentPage: page,
                     totalPages: totalPages,
@@ -102,7 +107,7 @@ export default function PostsPage() {
                         header: "Title",
                         cell: (post) => (
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-lg bg-muted flex-shrink-0 overflow-hidden">
+                                <div className="w-10 h-10 rounded-lg bg-muted flex-shrink-0 overflow-hidden relative">
                                     {post.featured_image ? (
                                         <Image
                                             src={post.featured_image}
@@ -176,6 +181,10 @@ export default function PostsPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                    <DropdownMenuItem onClick={() => handlePreview(post)}>
+                                        <Eye className="w-4 h-4 mr-2" />
+                                        Preview
+                                    </DropdownMenuItem>
                                     <DropdownMenuItem
                                         onClick={() => router.push(`/dashboard/posts/${post.id}/edit`)}
                                     >
