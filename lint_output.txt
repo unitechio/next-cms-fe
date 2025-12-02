@@ -1,8 +1,0 @@
-
-D:\Code\OWNER\CMS_BLOG\next-cms-fe\src\features\roles\components\role-form.tsx
-  24:25  warning  'X' is defined but never used             @typescript-eslint/no-unused-vars
-  59:45  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-  94:25  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-
-✖ 3 problems (2 errors, 1 warning)
-
