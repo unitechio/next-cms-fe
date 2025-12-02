@@ -16,7 +16,18 @@ export interface Post {
   created_at: string;
   updated_at: string;
   tags?: string[];
-  categories?: string[];
+  category_ids?: number[];
+  categories?: Array<{
+    id: number;
+    name: string;
+    slug: string;
+  }>;
+  // Analytics fields
+  view_count?: number;
+  avg_time_on_page?: number; // in seconds
+  bounce_rate?: number; // percentage
+  seo_score?: number; // 0-100
+  traffic_sources?: Record<string, number>;
 }
 
 export interface PostFilters {

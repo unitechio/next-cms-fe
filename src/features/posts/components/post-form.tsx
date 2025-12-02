@@ -20,104 +20,12 @@ import { postService } from "../services/post.service";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { ImageUpload } from "@/components/ui/image-upload";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useEffect, useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-const formSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  slug: z.string().min(1, "Slug is required"),
-  content: z.string().min(1, "Content is required"),
-  excerpt: z.string().optional(),
-  status: z.enum(["draft", "published", "archived"]),
-  featured_image: z.string().optional(),
-  tags: z.string().optional(),
-  categories: z.string().optional(),
-  meta_title: z.string().optional(),
-  meta_description: z.string().optional(),
-});
-
-type PostFormValues = z.infer<typeof formSchema>;
-
-interface PostFormProps {
-  initialData?: Post;
-}
-
-export function PostForm({ initialData }: PostFormProps) {
-  const router = useRouter();
-  const [isSaving, setIsSaving] = useState(false);
-
-  const form = useForm<PostFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: initialData ? {
-      title: initialData.title,
-      slug: initialData.slug,
-      content: initialData.content,
-      excerpt: initialData.excerpt || "",
-      status: initialData.status,
-      featured_image: initialData.featured_image || "",
-      tags: initialData.tags?.join(", ") || "",
-      categories: initialData.categories?.join(", ") || "",
-      meta_title: "",
-      meta_description: "",
-    } : {
-      title: "",
-      slug: "",
-      content: "",
-      excerpt: "",
-      status: "draft",
-      featured_image: "",
-      tags: "",
-      categories: "",
-      meta_title: "",
-      meta_description: "",
-    },
-  });
-
-  // Auto-generate slug from title
-  useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (name === 'title' && value.title && !initialData) {
-        const slug = value.title
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)/g, '');
-        form.setValue('slug', slug);
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [form, initialData]);
-
-  const onSubmit = async (values: PostFormValues) => {
-    setIsSaving(true);
-    try {
-      const postData = {
-        ...values,
-        tags: values.tags ? values.tags.split(',').map(t => t.trim()) : [],
-        categories: values.categories ? values.categories.split(',').map(c => c.trim()) : [],
-      };
-
-      if (initialData) {
-        await postService.updatePost(initialData.id, postData);
-        toast.success("Post updated successfully");
-      } else {
-        await postService.createPost(postData);
-        toast.success("Post created successfully");
-      }
-      router.push("/dashboard/posts");
-    } catch (error) {
-      toast.error("Failed to save post");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleSaveDraft = async () => {
-    form.setValue('status', 'draft');
-    form.handleSubmit(onSubmit)();
-  };
+initialData ?: Post;
+if (name === 'title' && value.title && !initialData) {
+  const slug = value.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
 
   const handlePublish = async () => {
     form.setValue('status', 'published');
