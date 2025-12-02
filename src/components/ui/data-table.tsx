@@ -45,7 +45,7 @@ interface DataTableProps<T> {
 }
 
 export function DataTable<T extends { id: string | number }>({
-    data,
+    data = [], // Default to empty array
     columns,
     isLoading,
     pagination,
@@ -56,9 +56,12 @@ export function DataTable<T extends { id: string | number }>({
     onSelectionChange,
     bulkActions,
 }: DataTableProps<T>) {
+    // Ensure data is always an array
+    const safeData = Array.isArray(data) ? data : [];
+
     const handleSelectAll = (checked: boolean) => {
         if (checked) {
-            onSelectionChange?.(data.map((item) => item.id));
+            onSelectionChange?.(safeData.map((item) => item.id));
         } else {
             onSelectionChange?.([]);
         }
@@ -72,8 +75,8 @@ export function DataTable<T extends { id: string | number }>({
         }
     };
 
-    const allSelected = data.length > 0 && data.every((item) => selectedIds.includes(item.id));
-    const someSelected = data.some((item) => selectedIds.includes(item.id)) && !allSelected;
+    const allSelected = safeData.length > 0 && safeData.every((item) => selectedIds.includes(item.id));
+    const someSelected = safeData.length > 0 && safeData.some((item) => selectedIds.includes(item.id)) && !allSelected;
 
     return (
         <div className="space-y-4">
@@ -138,7 +141,7 @@ export function DataTable<T extends { id: string | number }>({
                                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
                                 </TableCell>
                             </TableRow>
-                        ) : data.length === 0 ? (
+                        ) : safeData.length === 0 ? (
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length + (enableSelection ? 1 : 0)}
@@ -148,7 +151,7 @@ export function DataTable<T extends { id: string | number }>({
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            data.map((item) => (
+                            safeData.map((item) => (
                                 <TableRow key={item.id} data-state={selectedIds.includes(item.id) ? "selected" : undefined}>
                                     {enableSelection && (
                                         <TableCell>
@@ -176,35 +179,37 @@ export function DataTable<T extends { id: string | number }>({
             </div>
 
             {/* Pagination */}
-            {pagination && pagination.totalPages > 1 && (
+            {pagination && (
                 <div className="flex items-center justify-between px-2">
                     <div className="text-sm text-muted-foreground">
                         Page {pagination.currentPage} of {pagination.totalPages}
                     </div>
-                    <div className="flex items-center space-x-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                                pagination.onPageChange(pagination.currentPage - 1)
-                            }
-                            disabled={pagination.currentPage === 1}
-                        >
-                            <ChevronLeft className="h-4 w-4" />
-                            Previous
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                                pagination.onPageChange(pagination.currentPage + 1)
-                            }
-                            disabled={pagination.currentPage === pagination.totalPages}
-                        >
-                            Next
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                    </div>
+                    {pagination.totalPages > 1 && (
+                        <div className="flex items-center space-x-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                    pagination.onPageChange(pagination.currentPage - 1)
+                                }
+                                disabled={pagination.currentPage === 1}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                                Previous
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                    pagination.onPageChange(pagination.currentPage + 1)
+                                }
+                                disabled={pagination.currentPage === pagination.totalPages}
+                            >
+                                Next
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

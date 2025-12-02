@@ -20,6 +20,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { parseApiResponse } from "@/lib/api-utils";
 
 export default function PostsPage() {
     const router = useRouter();
@@ -37,11 +38,13 @@ export default function PostsPage() {
                 limit: 10,
                 search,
             });
-            setPosts(response.data || []);
-            setTotalPages(response.meta?.total_pages || 1);
+            const { data, totalPages: pages } = parseApiResponse<Post>(response);
+            setPosts(data);
+            setTotalPages(pages);
         } catch (error) {
             console.error("Failed to fetch posts:", error);
             toast.error("Failed to fetch posts");
+            setPosts([]);
         } finally {
             setIsLoading(false);
         }

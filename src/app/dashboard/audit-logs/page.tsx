@@ -1,37 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { auditLogService } from "@/features/audit-logs/services/audit-log.service";
 import { AuditLog } from "@/features/audit-logs/types";
 import { Activity, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { parseApiResponse } from "@/lib/api-utils";
+import { toast } from "sonner";
+import { Pagination } from "@/components/ui/pagination";
 
 export default function AuditLogsPage() {
     const [logs, setLogs] = useState<AuditLog[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(20);
     const [totalPages, setTotalPages] = useState(1);
 
+    const fetchLogs = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const response = await auditLogService.getAuditLogs({
+                page,
+                limit: pageSize,
+            });
+            console.log("Audit logs response:", response);
+            const { data, totalPages: pages } = parseApiResponse<AuditLog>(response);
+            console.log("Parsed data:", data, "Total pages:", pages);
+            setLogs(data);
+            setTotalPages(pages);
+        } catch (error) {
+            console.error("Failed to fetch audit logs:", error);
+            toast.error("Failed to load audit logs");
+            setLogs([]);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [page, pageSize]);
+
     useEffect(() => {
-        const fetchLogs = async () => {
-            setIsLoading(true);
-            try {
-                const response = await auditLogService.getAuditLogs({
-                    page,
-                    limit: 20,
-                });
-                setLogs(response.data || []);
-                setTotalPages(response.meta?.total_pages || 1);
-            } catch (error) {
-                console.error("Failed to fetch audit logs:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
         fetchLogs();
-    }, [page]);
+    }, [fetchLogs]);
+
+    const handlePageSizeChange = (newSize: number) => {
+        setPageSize(newSize);
+        setPage(1); // Reset to first page when changing page size
+    };
 
     return (
         <div className="space-y-6">
@@ -45,11 +60,6 @@ export default function AuditLogsPage() {
             <DataTable
                 data={logs}
                 isLoading={isLoading}
-                pagination={{
-                    currentPage: page,
-                    totalPages: totalPages,
-                    onPageChange: setPage,
-                }}
                 columns={[
                     {
                         header: "Action",
@@ -114,6 +124,18 @@ export default function AuditLogsPage() {
                         ),
                     },
                 ]}
+            />
+
+            {/* Custom Pagination Component */}
+            <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                pageSize={pageSize}
+                onPageSizeChange={handlePageSizeChange}
+                showPageSize={true}
+                showFirstLast={true}
+                pageSizeOptions={[10, 20, 50, 100]}
             />
         </div>
     );

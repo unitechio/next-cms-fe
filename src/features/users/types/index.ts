@@ -25,7 +25,7 @@ export interface User {
   status: 'active' | 'inactive' | 'banned';
   avatar_url?: string;
   phone?: string;
-  department?: string;
+  department?: string | { code: string; name: string };
   position?: string;
   last_login_at?: string;
 }

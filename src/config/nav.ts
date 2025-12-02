@@ -1,4 +1,4 @@
-import { LayoutDashboard, Newspaper, Settings, Users, Bell } from "lucide-react";
+import { LayoutDashboard, Newspaper, Settings, Users, Bell, Shield, Lock } from "lucide-react";
 
 export const dashboard = [
     {
@@ -15,6 +15,16 @@ export const dashboard = [
         label: "Users",
         path: "/dashboard/users",
         icon: Users,
+    },
+    {
+        label: "Roles",
+        path: "/dashboard/roles",
+        icon: Shield,
+    },
+    {
+        label: "Authorization",
+        path: "/dashboard/authorization/modules",
+        icon: Lock,
     },
     {
         label: "Notifications",

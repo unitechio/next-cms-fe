@@ -18,6 +18,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { parseApiResponse } from "@/lib/api-utils";
+import { toast } from "sonner";
 
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);
@@ -34,10 +36,13 @@ export default function UsersPage() {
                 limit: 10,
                 search,
             });
-            setUsers(response.data || []);
-            setTotalPages(response.meta?.total_pages || 1);
+            const { data, totalPages: pages } = parseApiResponse<User>(response);
+            setUsers(data);
+            setTotalPages(pages);
         } catch (error) {
             console.error("Failed to fetch users:", error);
+            toast.error("Failed to load users");
+            setUsers([]);
         } finally {
             setIsLoading(false);
         }

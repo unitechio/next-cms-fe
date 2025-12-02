@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DepartmentForm } from "@/features/authorization/components/department-form";
 import { CreateDepartmentRequest, UpdateDepartmentRequest } from "@/features/authorization/types";
+import { parseApiResponse } from "@/lib/api-utils";
 
 export default function DepartmentsPage() {
     const [departments, setDepartments] = useState<Department[]>([]);
@@ -25,16 +26,18 @@ export default function DepartmentsPage() {
     const fetchDepartments = useCallback(async () => {
         try {
             setLoading(true);
-            const result = await authorizationService.getDepartments({
+            const response = await authorizationService.getDepartments({
                 page,
                 limit: 10,
                 search
             });
-            setDepartments(result.data);
-            setTotalPages(result.meta?.total_pages || 1);
+            const { data, totalPages: pages } = parseApiResponse<Department>(response);
+            setDepartments(data);
+            setTotalPages(pages);
         } catch (error) {
             console.error("Failed to fetch departments:", error);
             toast.error("Failed to load departments");
+            setDepartments([]);
         } finally {
             setLoading(false);
         }
