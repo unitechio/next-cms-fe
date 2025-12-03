@@ -20,7 +20,7 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/ui/alert-dialog';
 
 export default function PagesPage() {
     const router = useRouter();
@@ -28,6 +28,7 @@ export default function PagesPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [pageToDelete, setPageToDelete] = useState<string | null>(null);
@@ -37,11 +38,11 @@ export default function PagesPage() {
             setLoading(true);
             const response = await pageService.getPages({
                 page,
-                limit: 10,
+                limit: pageSize,
                 search: search || undefined,
             });
             setPages(response.data || []);
-            setTotalPages(response.pagination?.total_pages || 1);
+            setTotalPages(response.meta?.total_pages || 1);
         } catch (error) {
             toast.error('Failed to load pages');
             console.error(error);
@@ -52,7 +53,12 @@ export default function PagesPage() {
 
     useEffect(() => {
         loadPages();
-    }, [page, search]);
+    }, [page, pageSize, search]);
+
+    const handlePageSizeChange = (size: number) => {
+        setPageSize(size);
+        setPage(1);
+    };
 
     const handleDelete = async () => {
         if (!pageToDelete) return;
@@ -186,11 +192,15 @@ export default function PagesPage() {
             <DataTable
                 columns={columns}
                 data={pages}
-                loading={loading}
+                isLoading={loading}
                 pagination={{
-                    page,
-                    totalPages,
+                    currentPage: page,
+                    totalPages: totalPages,
                     onPageChange: setPage,
+                    pageSize: pageSize,
+                    onPageSizeChange: handlePageSizeChange,
+                    showPageSize: true,
+                    showFirstLast: true,
                 }}
             />
 

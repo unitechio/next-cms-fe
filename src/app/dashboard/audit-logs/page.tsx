@@ -17,18 +17,24 @@ export default function AuditLogsPage() {
     const [logs, setLogs] = useState<AuditLog[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(20);
     const [search, setSearch] = useState("");
     const [totalPages, setTotalPages] = useState(1);
     const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
     const [detailOpen, setDetailOpen] = useState(false);
     const [filters, setFilters] = useState({});
 
+    // Reset page when filters or search change
+    useEffect(() => {
+        setPage(1);
+    }, [search, filters]);
+
     const fetchLogs = useCallback(async () => {
         setIsLoading(true);
         try {
             const response = await auditLogService.getAuditLogs({
                 page,
-                limit: 20,
+                limit: pageSize,
                 search,
                 ...filters,
             });
@@ -41,7 +47,7 @@ export default function AuditLogsPage() {
         } finally {
             setIsLoading(false);
         }
-    }, [page, search, filters]);
+    }, [page, pageSize, search, filters]);
 
     useEffect(() => {
         const debounce = setTimeout(() => {
@@ -77,6 +83,11 @@ export default function AuditLogsPage() {
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Failed to export audit logs');
         }
+    };
+
+    const handlePageSizeChange = (size: number) => {
+        setPageSize(size);
+        setPage(1);
     };
 
     const getActionColor = (action: string) => {
@@ -136,6 +147,10 @@ export default function AuditLogsPage() {
                     currentPage: page,
                     totalPages: totalPages,
                     onPageChange: setPage,
+                    pageSize: pageSize,
+                    onPageSizeChange: handlePageSizeChange,
+                    showPageSize: true,
+                    showFirstLast: true,
                 }}
                 columns={[
                     {

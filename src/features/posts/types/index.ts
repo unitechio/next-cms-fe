@@ -22,6 +22,9 @@ export interface Post {
     name: string;
     slug: string;
   }>;
+  // SEO fields
+  meta_title?: string;
+  meta_description?: string;
   // Analytics fields
   view_count?: number;
   avg_time_on_page?: number; // in seconds

@@ -28,6 +28,7 @@ export default function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState("");
     const [totalPages, setTotalPages] = useState(1);
 
@@ -36,7 +37,7 @@ export default function UsersPage() {
         try {
             const response = await userService.getUsers({
                 page,
-                limit: 10,
+                limit: pageSize,
                 search,
             });
             const { data, totalPages: pages } = parseApiResponse<User>(response);
@@ -49,7 +50,7 @@ export default function UsersPage() {
         } finally {
             setIsLoading(false);
         }
-    }, [page, search]);
+    }, [page, pageSize, search]);
 
     useEffect(() => {
         const debounce = setTimeout(() => {
@@ -57,6 +58,11 @@ export default function UsersPage() {
         }, 300);
         return () => clearTimeout(debounce);
     }, [fetchUsers]);
+
+    const handlePageSizeChange = (size: number) => {
+        setPageSize(size);
+        setPage(1); // Reset to first page when changing page size
+    };
 
     return (
         <div className="space-y-6">
@@ -85,6 +91,10 @@ export default function UsersPage() {
                     currentPage: page,
                     totalPages: totalPages,
                     onPageChange: setPage,
+                    pageSize: pageSize,
+                    onPageSizeChange: handlePageSizeChange,
+                    showPageSize: true,
+                    showFirstLast: true,
                 }}
                 columns={[
                     {

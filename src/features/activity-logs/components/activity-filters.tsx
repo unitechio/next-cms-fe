@@ -30,16 +30,16 @@ interface ActivityFiltersProps {
 }
 
 export function ActivityFilters({ onFilterChange }: ActivityFiltersProps) {
-    const [activity, setActivity] = useState<string>('');
-    const [category, setCategory] = useState<string>('');
+    const [activity, setActivity] = useState<string>('all');
+    const [category, setCategory] = useState<string>('all');
     const [startDate, setStartDate] = useState<Date>();
     const [endDate, setEndDate] = useState<Date>();
     const [isOpen, setIsOpen] = useState(false);
 
     const handleApply = () => {
         onFilterChange({
-            activity: activity || undefined,
-            category: category || undefined,
+            activity: activity && activity !== 'all' ? activity : undefined,
+            category: category && category !== 'all' ? category : undefined,
             startDate: startDate ? format(startDate, 'yyyy-MM-dd') : undefined,
             endDate: endDate ? format(endDate, 'yyyy-MM-dd') : undefined,
         });
@@ -47,14 +47,14 @@ export function ActivityFilters({ onFilterChange }: ActivityFiltersProps) {
     };
 
     const handleReset = () => {
-        setActivity('');
-        setCategory('');
+        setActivity('all');
+        setCategory('all');
         setStartDate(undefined);
         setEndDate(undefined);
         onFilterChange({});
     };
 
-    const hasFilters = activity || category || startDate || endDate;
+    const hasFilters = (activity && activity !== 'all') || (category && category !== 'all') || startDate || endDate;
 
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -64,7 +64,12 @@ export function ActivityFilters({ onFilterChange }: ActivityFiltersProps) {
                     Filters
                     {hasFilters && (
                         <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
-                            {[activity, category, startDate, endDate].filter(Boolean).length}
+                            {[
+                                activity && activity !== 'all',
+                                category && category !== 'all',
+                                startDate,
+                                endDate
+                            ].filter(Boolean).length}
                         </span>
                     )}
                 </Button>
@@ -94,7 +99,7 @@ export function ActivityFilters({ onFilterChange }: ActivityFiltersProps) {
                                 <SelectValue placeholder="All activities" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="">All activities</SelectItem>
+                                <SelectItem value="all">All activities</SelectItem>
                                 {Object.entries(ActivityTypes).map(([key, value]) => (
                                     <SelectItem key={key} value={value}>
                                         {value}
@@ -112,7 +117,7 @@ export function ActivityFilters({ onFilterChange }: ActivityFiltersProps) {
                                 <SelectValue placeholder="All categories" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="">All categories</SelectItem>
+                                <SelectItem value="all">All categories</SelectItem>
                                 {Object.entries(ActivityCategories).map(([key, value]) => (
                                     <SelectItem key={key} value={value}>
                                         {value}

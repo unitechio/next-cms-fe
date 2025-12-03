@@ -17,6 +17,7 @@ export default function ModulesPage() {
     const [modules, setModules] = useState<Module[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState("");
     const [totalPages, setTotalPages] = useState(1);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -28,7 +29,7 @@ export default function ModulesPage() {
             setLoading(true);
             const response = await authorizationService.getModules({
                 page,
-                limit: 10,
+                limit: pageSize,
                 search
             });
             const { data, totalPages: pages } = parseApiResponse<Module>(response);
@@ -41,7 +42,7 @@ export default function ModulesPage() {
         } finally {
             setLoading(false);
         }
-    }, [page, search]);
+    }, [page, pageSize, search]);
 
     useEffect(() => {
         const debounce = setTimeout(() => {
@@ -92,6 +93,11 @@ export default function ModulesPage() {
         }
     };
 
+    const handlePageSizeChange = (size: number) => {
+        setPageSize(size);
+        setPage(1);
+    };
+
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center">
@@ -117,6 +123,10 @@ export default function ModulesPage() {
                     currentPage: page,
                     totalPages: totalPages,
                     onPageChange: setPage,
+                    pageSize: pageSize,
+                    onPageSizeChange: handlePageSizeChange,
+                    showPageSize: true,
+                    showFirstLast: true,
                 }}
                 columns={[
                     {

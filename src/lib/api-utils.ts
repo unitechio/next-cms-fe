@@ -15,6 +15,19 @@ export function parseApiResponse<T>(response: any): {
         return { data: response, totalPages: 1 };
     }
 
+    // Handle standard response format: { success: true, data: [...], meta: { ... } }
+    if (response?.meta && Array.isArray(response?.data)) {
+        let totalPages = 1;
+        if (response.meta.pagination?.last_page) {
+            totalPages = response.meta.pagination.last_page;
+        } else if (response.meta.pagination?.total && response.meta.pagination?.per_page) {
+            totalPages = Math.ceil(response.meta.pagination.total / response.meta.pagination.per_page);
+        } else if (response.meta.total_pages) {
+            totalPages = response.meta.total_pages;
+        }
+        return { data: response.data, totalPages };
+    }
+
     // Extract the main data object (could be response.data or response itself)
     const mainData = response?.data || response;
     

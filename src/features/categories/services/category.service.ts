@@ -35,34 +35,37 @@ export const categoryService = {
     /**
      * Get categories in tree structure
      */
+    /**
+     * Get categories in tree structure
+     */
     getCategoryTree: async (type?: string) => {
         const params = type ? `?type=${type}` : '';
-        const response = await apiClient.get<CategoryTree[]>(`/categories/tree${params}`);
-        return response.data;
+        const response = await apiClient.get<ApiResponse<CategoryTree[]>>(`/categories/tree${params}`);
+        return response.data.data;
     },
 
     /**
      * Get single category by ID
      */
     getCategory: async (id: number) => {
-        const response = await apiClient.get<Category>(`/categories/${id}`);
-        return response.data;
+        const response = await apiClient.get<ApiResponse<Category>>(`/categories/${id}`);
+        return response.data.data;
     },
 
     /**
      * Create new category
      */
     createCategory: async (data: CreateCategoryRequest) => {
-        const response = await apiClient.post<Category>('/categories', data);
-        return response.data;
+        const response = await apiClient.post<ApiResponse<Category>>('/categories', data);
+        return response.data.data;
     },
 
     /**
      * Update existing category
      */
     updateCategory: async (id: number, data: UpdateCategoryRequest) => {
-        const response = await apiClient.put<Category>(`/categories/${id}`, data);
-        return response.data;
+        const response = await apiClient.put<ApiResponse<Category>>(`/categories/${id}`, data);
+        return response.data.data;
     },
 
     /**
@@ -76,8 +79,8 @@ export const categoryService = {
      * Reorder category (change parent or order)
      */
     reorderCategory: async (id: number, data: ReorderCategoryRequest) => {
-        const response = await apiClient.put<Category>(`/categories/${id}/reorder`, data);
-        return response.data;
+        const response = await apiClient.put<ApiResponse<Category>>(`/categories/${id}/reorder`, data);
+        return response.data.data;
     },
 
     /**
@@ -87,9 +90,9 @@ export const categoryService = {
         const params = new URLSearchParams({ status: 'active' });
         if (type) params.append('type', type);
 
-        const response = await apiClient.get<Category[]>(
+        const response = await apiClient.get<ApiResponse<Category[]>>(
             `/categories/active?${params.toString()}`
         );
-        return response.data;
+        return response.data.data;
     },
 };

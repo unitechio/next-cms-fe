@@ -4,8 +4,9 @@ import { Sidebar } from "@/components/layout/sidebar/sidebar";
 import { DashboardHeader } from "@/components/layout/header/dashboard-header";
 import { useAuth } from "@/context/auth-context";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function DashboardLayout({
   children,
@@ -14,6 +15,20 @@ export default function DashboardLayout({
 }) {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    const collapsed = localStorage.getItem("sidebarCollapsed");
+    if (collapsed === "true") {
+      setIsCollapsed(true);
+    }
+  }, []);
+
+  const toggleCollapse = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem("sidebarCollapsed", String(newState));
+  };
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -35,8 +50,11 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar />
-      <main className="lg:pl-72 min-h-screen transition-all duration-300">
+      <Sidebar isCollapsed={isCollapsed} toggleCollapse={toggleCollapse} />
+      <main className={cn(
+        "min-h-screen transition-all duration-300",
+        isCollapsed ? "lg:pl-20" : "lg:pl-72"
+      )}>
         <DashboardHeader />
         <div className="container p-8 animate-in fade-in zoom-in-95 duration-500">
           {children}

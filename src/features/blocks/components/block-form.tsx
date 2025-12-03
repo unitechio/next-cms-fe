@@ -122,7 +122,7 @@ export function BlockForm({ blockId, initialData }: BlockFormProps) {
                         {blockId ? 'Update block configuration' : 'Create a new reusable block'}
                     </p>
                 </div>
-                <Button type="submit" disabled={loading}>
+                <Button type="submit" disabled={loading} className="cursor-pointer">
                     <Save className="mr-2 h-4 w-4" />
                     Save Block
                 </Button>

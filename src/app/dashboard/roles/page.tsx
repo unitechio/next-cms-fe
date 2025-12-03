@@ -34,6 +34,7 @@ export default function RolesPage() {
     const [roles, setRoles] = useState<Role[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState("");
     const [totalPages, setTotalPages] = useState(1);
     const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -44,7 +45,7 @@ export default function RolesPage() {
         try {
             const response = await roleService.getRoles({
                 page,
-                limit: 10,
+                limit: pageSize,
                 search,
             });
             const { data, totalPages: pages } = parseApiResponse<Role>(response);
@@ -57,7 +58,7 @@ export default function RolesPage() {
         } finally {
             setIsLoading(false);
         }
-    }, [page, search]);
+    }, [page, pageSize, search]);
 
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this role?")) return;
@@ -79,6 +80,11 @@ export default function RolesPage() {
     const handleViewPermissions = (role: Role) => {
         setSelectedRole(role);
         setIsPermissionsDialogOpen(true);
+    };
+
+    const handlePageSizeChange = (size: number) => {
+        setPageSize(size);
+        setPage(1);
     };
 
     useEffect(() => {
@@ -115,6 +121,10 @@ export default function RolesPage() {
                     currentPage: page,
                     totalPages: totalPages,
                     onPageChange: setPage,
+                    pageSize: pageSize,
+                    onPageSizeChange: handlePageSizeChange,
+                    showPageSize: true,
+                    showFirstLast: true,
                 }}
                 columns={[
                     {

@@ -28,6 +28,7 @@ export default function PostsPage() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
     const [filters, setFilters] = useState({});
 
@@ -36,7 +37,7 @@ export default function PostsPage() {
         try {
             const response = await postService.getPosts({
                 page,
-                limit: 10,
+                limit: pageSize,
                 ...filters,
             });
             const { data, totalPages: pages } = parseApiResponse<Post>(response);
@@ -49,7 +50,7 @@ export default function PostsPage() {
         } finally {
             setIsLoading(false);
         }
-    }, [page, filters]);
+    }, [page, pageSize, filters]);
 
     useEffect(() => {
         const debounce = setTimeout(() => {
@@ -72,6 +73,11 @@ export default function PostsPage() {
 
     const handlePreview = (post: Post) => {
         window.open(`/blog/${post.slug}`, '_blank');
+    };
+
+    const handlePageSizeChange = (size: number) => {
+        setPageSize(size);
+        setPage(1);
     };
 
     return (
@@ -101,6 +107,10 @@ export default function PostsPage() {
                     currentPage: page,
                     totalPages: totalPages,
                     onPageChange: setPage,
+                    pageSize: pageSize,
+                    onPageSizeChange: handlePageSizeChange,
+                    showPageSize: true,
+                    showFirstLast: true,
                 }}
                 columns={[
                     {

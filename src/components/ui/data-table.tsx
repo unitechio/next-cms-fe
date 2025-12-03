@@ -10,9 +10,10 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, ChevronRight, Loader2, Search } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import React from "react";
-
+import { Pagination } from "@/components/ui/pagination";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Column<T> {
     header: string;
@@ -20,8 +21,6 @@ interface Column<T> {
     cell?: (item: T) => React.ReactNode;
     className?: string;
 }
-
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface DataTableProps<T> {
     data: T[];
@@ -31,6 +30,10 @@ interface DataTableProps<T> {
         currentPage: number;
         totalPages: number;
         onPageChange: (page: number) => void;
+        pageSize?: number;
+        onPageSizeChange?: (size: number) => void;
+        showPageSize?: boolean;
+        showFirstLast?: boolean;
     };
     search?: {
         value: string;
@@ -180,37 +183,15 @@ export function DataTable<T extends { id: string | number }>({
 
             {/* Pagination */}
             {pagination && (
-                <div className="flex items-center justify-between px-2">
-                    <div className="text-sm text-muted-foreground">
-                        Page {pagination.currentPage} of {pagination.totalPages}
-                    </div>
-                    {pagination.totalPages > 1 && (
-                        <div className="flex items-center space-x-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                    pagination.onPageChange(pagination.currentPage - 1)
-                                }
-                                disabled={pagination.currentPage === 1}
-                            >
-                                <ChevronLeft className="h-4 w-4" />
-                                Previous
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                    pagination.onPageChange(pagination.currentPage + 1)
-                                }
-                                disabled={pagination.currentPage === pagination.totalPages}
-                            >
-                                Next
-                                <ChevronRight className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    )}
-                </div>
+                <Pagination
+                    currentPage={pagination.currentPage}
+                    totalPages={pagination.totalPages}
+                    onPageChange={pagination.onPageChange}
+                    pageSize={pagination.pageSize || 10}
+                    onPageSizeChange={pagination.onPageSizeChange}
+                    showPageSize={pagination.showPageSize ?? true}
+                    showFirstLast={pagination.showFirstLast ?? true}
+                />
             )}
         </div>
     );

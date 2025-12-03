@@ -35,7 +35,7 @@ export default function CategoriesPage() {
     try {
       const type = activeTab === "all" ? undefined : (activeTab as CategoryType);
       const data = await categoryService.getCategoryTree(type);
-      setCategories(data);
+      setCategories(data || []);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
       toast.error("Failed to fetch categories");
