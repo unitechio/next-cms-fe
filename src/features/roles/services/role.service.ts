@@ -1,6 +1,6 @@
-import { apiClient } from '@/lib/axios';
-import { Role, RoleFilters, Permission } from '../types';
-import { ApiResponse } from '@/types';
+import { apiClient } from "@/lib/axios";
+import { Role, RoleFilters, Permission } from "../types";
+import { ApiResponse } from "@/types";
 
 export const roleService = {
   getRoles: async (filters: RoleFilters) => {
@@ -8,9 +8,11 @@ export const roleService = {
       page: filters.page.toString(),
       limit: filters.limit.toString(),
     });
-    if (filters.search) params.append('search', filters.search);
+    if (filters.search) params.append("search", filters.search);
 
-    const response = await apiClient.get<ApiResponse<Role[]>>(`/roles?${params.toString()}`);
+    const response = await apiClient.get<ApiResponse<Role[]>>(
+      `/roles?${params.toString()}`,
+    );
     return response.data;
   },
 
@@ -20,7 +22,7 @@ export const roleService = {
   },
 
   createRole: async (data: Partial<Role>) => {
-    const response = await apiClient.post<Role>('/roles', data);
+    const response = await apiClient.post<Role>("/roles", data);
     return response.data;
   },
 
@@ -34,18 +36,24 @@ export const roleService = {
   },
 
   getPermissions: async () => {
-    const response = await apiClient.get<{ data: Permission[] }>('/permissions');
+    const response = await apiClient.get<{ data: Permission[] }>(
+      "/permissions",
+    );
     return response.data;
   },
 
   // Role-Permission Management
   getRolePermissions: async (roleId: string) => {
-    const response = await apiClient.get<ApiResponse<Permission[]>>(`/roles/${roleId}/permissions`);
+    const response = await apiClient.get<ApiResponse<Permission[]>>(
+      `/roles/${roleId}/permissions`,
+    );
     return response.data;
   },
 
   assignPermission: async (roleId: string, permissionId: number) => {
-    const response = await apiClient.post(`/roles/${roleId}/permissions`, { permission_id: permissionId });
+    const response = await apiClient.post(`/roles/${roleId}/permissions`, {
+      permission_id: permissionId,
+    });
     return response.data;
   },
 
