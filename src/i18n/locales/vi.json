@@ -1,0 +1,100 @@
+{
+    "common": {
+        "welcome": "Chào mừng",
+        "home": "Trang chủ",
+        "about": "Giới thiệu",
+        "contact": "Liên hệ",
+        "login": "Đăng nhập",
+        "logout": "Đăng xuất",
+        "register": "Đăng ký",
+        "search": "Tìm kiếm",
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "delete": "Xóa",
+        "edit": "Sửa",
+        "create": "Tạo mới",
+        "update": "Cập nhật",
+        "loading": "Đang tải...",
+        "error": "Lỗi",
+        "success": "Thành công"
+    },
+    "navigation": {
+        "dashboard": "Bảng điều khiển",
+        "posts": "Bài viết",
+        "media": "Thư viện",
+        "documents": "Tài liệu",
+        "customers": "Khách hàng",
+        "settings": "Cài đặt",
+        "users": "Người dùng"
+    },
+    "posts": {
+        "title": "Bài viết",
+        "createPost": "Tạo bài viết",
+        "editPost": "Sửa bài viết",
+        "deletePost": "Xóa bài viết",
+        "publishPost": "Xuất bản",
+        "draftPost": "Bản nháp",
+        "scheduledPost": "Đã lên lịch",
+        "viewPost": "Xem bài viết",
+        "postTitle": "Tiêu đề",
+        "postContent": "Nội dung",
+        "postExcerpt": "Trích dẫn",
+        "postStatus": "Trạng thái",
+        "postAuthor": "Tác giả",
+        "postCategory": "Danh mục",
+        "postTags": "Thẻ",
+        "postPublishedAt": "Ngày xuất bản",
+        "noPostsFound": "Không tìm thấy bài viết"
+    },
+    "media": {
+        "title": "Thư viện",
+        "uploadMedia": "Tải lên",
+        "deleteMedia": "Xóa",
+        "mediaLibrary": "Thư viện media",
+        "selectMedia": "Chọn media",
+        "noMediaFound": "Không tìm thấy media"
+    },
+    "documents": {
+        "title": "Tài liệu",
+        "uploadDocument": "Tải tài liệu lên",
+        "deleteDocument": "Xóa tài liệu",
+        "documentLibrary": "Thư viện tài liệu",
+        "noDocumentsFound": "Không tìm thấy tài liệu"
+    },
+    "customers": {
+        "title": "Khách hàng",
+        "createCustomer": "Tạo khách hàng",
+        "editCustomer": "Sửa khách hàng",
+        "deleteCustomer": "Xóa khách hàng",
+        "customerName": "Tên khách hàng",
+        "customerEmail": "Email",
+        "customerPhone": "Số điện thoại",
+        "customerCompany": "Công ty",
+        "noCustomersFound": "Không tìm thấy khách hàng"
+    },
+    "settings": {
+        "title": "Cài đặt",
+        "general": "Chung",
+        "appearance": "Giao diện",
+        "notifications": "Thông báo",
+        "language": "Ngôn ngữ",
+        "theme": "Chủ đề",
+        "darkMode": "Chế độ tối",
+        "lightMode": "Chế độ sáng",
+        "systemMode": "Theo hệ thống"
+    },
+    "validation": {
+        "required": "Trường này là bắt buộc",
+        "email": "Email không hợp lệ",
+        "minLength": "Độ dài tối thiểu là {min} ký tự",
+        "maxLength": "Độ dài tối đa là {max} ký tự"
+    },
+    "messages": {
+        "saveSuccess": "Lưu thành công",
+        "deleteSuccess": "Xóa thành công",
+        "updateSuccess": "Cập nhật thành công",
+        "createSuccess": "Tạo mới thành công",
+        "error": "Đã xảy ra lỗi",
+        "confirmDelete": "Bạn có chắc chắn muốn xóa mục này?"
+    }
+}

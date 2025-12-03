@@ -1,0 +1,100 @@
+{
+    "common": {
+        "welcome": "Bienvenue",
+        "home": "Accueil",
+        "about": "À propos",
+        "contact": "Contact",
+        "login": "Connexion",
+        "logout": "Déconnexion",
+        "register": "S'inscrire",
+        "search": "Rechercher",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "edit": "Modifier",
+        "create": "Créer",
+        "update": "Mettre à jour",
+        "loading": "Chargement...",
+        "error": "Erreur",
+        "success": "Succès"
+    },
+    "navigation": {
+        "dashboard": "Tableau de bord",
+        "posts": "Articles",
+        "media": "Médias",
+        "documents": "Documents",
+        "customers": "Clients",
+        "settings": "Paramètres",
+        "users": "Utilisateurs"
+    },
+    "posts": {
+        "title": "Articles",
+        "createPost": "Créer un article",
+        "editPost": "Modifier l'article",
+        "deletePost": "Supprimer l'article",
+        "publishPost": "Publier",
+        "draftPost": "Brouillon",
+        "scheduledPost": "Programmé",
+        "viewPost": "Voir l'article",
+        "postTitle": "Titre",
+        "postContent": "Contenu",
+        "postExcerpt": "Extrait",
+        "postStatus": "Statut",
+        "postAuthor": "Auteur",
+        "postCategory": "Catégorie",
+        "postTags": "Tags",
+        "postPublishedAt": "Publié le",
+        "noPostsFound": "Aucun article trouvé"
+    },
+    "media": {
+        "title": "Médias",
+        "uploadMedia": "Télécharger",
+        "deleteMedia": "Supprimer",
+        "mediaLibrary": "Bibliothèque média",
+        "selectMedia": "Sélectionner média",
+        "noMediaFound": "Aucun média trouvé"
+    },
+    "documents": {
+        "title": "Documents",
+        "uploadDocument": "Télécharger un document",
+        "deleteDocument": "Supprimer le document",
+        "documentLibrary": "Bibliothèque de documents",
+        "noDocumentsFound": "Aucun document trouvé"
+    },
+    "customers": {
+        "title": "Clients",
+        "createCustomer": "Créer un client",
+        "editCustomer": "Modifier le client",
+        "deleteCustomer": "Supprimer le client",
+        "customerName": "Nom du client",
+        "customerEmail": "Email",
+        "customerPhone": "Téléphone",
+        "customerCompany": "Entreprise",
+        "noCustomersFound": "Aucun client trouvé"
+    },
+    "settings": {
+        "title": "Paramètres",
+        "general": "Général",
+        "appearance": "Apparence",
+        "notifications": "Notifications",
+        "language": "Langue",
+        "theme": "Thème",
+        "darkMode": "Mode sombre",
+        "lightMode": "Mode clair",
+        "systemMode": "Système"
+    },
+    "validation": {
+        "required": "Ce champ est requis",
+        "email": "Email invalide",
+        "minLength": "La longueur minimale est de {min} caractères",
+        "maxLength": "La longueur maximale est de {max} caractères"
+    },
+    "messages": {
+        "saveSuccess": "Enregistré avec succès",
+        "deleteSuccess": "Supprimé avec succès",
+        "updateSuccess": "Mis à jour avec succès",
+        "createSuccess": "Créé avec succès",
+        "error": "Une erreur s'est produite",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet élément ?"
+    }
+}
